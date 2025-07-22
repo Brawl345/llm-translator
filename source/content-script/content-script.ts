@@ -60,6 +60,9 @@ class TranslationModal {
                             </div>
                         </div>
                     </div>
+                    <div class="llm-modal-footer">
+                        <small>${chrome.i18n.getMessage('disclaimerText')}</small>
+                    </div>
                 </div>
             </div>
         `;
@@ -127,6 +130,8 @@ class TranslationModal {
                 max-height: 80vh;
                 overflow: hidden;
                 animation: llm-modal-appear 0.2s ease-out;
+                display: flex;
+                flex-direction: column;
             }
 
             @keyframes llm-modal-appear {
@@ -144,9 +149,10 @@ class TranslationModal {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                padding: 20px;
+                padding: 16px 20px;
                 border-bottom: 1px solid #e2e8f0;
                 background: #f8fafc;
+                flex-shrink: 0;
             }
 
             .llm-modal-header h3 {
@@ -179,8 +185,23 @@ class TranslationModal {
 
             .llm-modal-content {
                 padding: 20px;
-                max-height: calc(80vh - 100px);
+                flex: 1;
                 overflow-y: auto;
+                min-height: 0;
+            }
+
+            .llm-modal-footer {
+                padding: 12px 20px;
+                border-top: 1px solid #e2e8f0;
+                background: #f8fafc;
+                text-align: center;
+                flex-shrink: 0;
+            }
+
+            .llm-modal-footer small {
+                color: #718096;
+                font-size: 12px;
+                margin: 0;
             }
 
             .llm-text-section {
@@ -335,7 +356,8 @@ class TranslationModal {
                 }
                 
                 .llm-modal-header,
-                .llm-modal-content {
+                .llm-modal-content,
+                .llm-modal-footer {
                     padding: 16px;
                 }
             }

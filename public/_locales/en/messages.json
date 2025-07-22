@@ -155,5 +155,8 @@
                 "example": "45000"
             }
         }
+    },
+    "disclaimerText": {
+        "message": "LLMs can make mistakes, verify important information."
     }
 }
