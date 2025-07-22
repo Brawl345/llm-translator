@@ -4,7 +4,6 @@ import type {
     ShowModalMessage,
     TranslationStreamMessage,
     GetAdditionalContextMessage,
-    ContextSuccessMessage,
     ContextErrorMessage,
     ContextStreamMessage
 } from '../shared/types.js';
@@ -44,7 +43,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     }
 });
 
-chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (message, sender, _sendResponse) => {
     if (message.type === 'GET_ADDITIONAL_CONTEXT' && sender.tab?.id) {
         const contextMessage = message as GetAdditionalContextMessage;
         try {
@@ -237,7 +236,6 @@ Translate the following text to German:`;
                         }
                     } catch (_error) {
                         // Skip invalid JSON chunks
-                        continue;
                     }
                 }
             }
@@ -341,7 +339,6 @@ Explain rarely known words, slang, or cultural context in German:`;
                         }
                     } catch (_error) {
                         // Skip invalid JSON chunks
-                        continue;
                     }
                 }
             }

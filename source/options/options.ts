@@ -25,16 +25,21 @@ class OptionsPage {
     }
 
     private localizeUI(): void {
-        document.getElementById('pageTitle')!.textContent = chrome.i18n.getMessage('settingsTitle');
-        document.getElementById('settingsLegend')!.textContent = chrome.i18n.getMessage('settingsTitle');
-        document.getElementById('apiKeyLabel')!.textContent = chrome.i18n.getMessage('apiKeyLabel');
+        const pageTitle = document.getElementById('pageTitle');
+        if (pageTitle) pageTitle.textContent = chrome.i18n.getMessage('settingsTitle');
+        const settingsLegend = document.getElementById('settingsLegend');
+        if (settingsLegend) settingsLegend.textContent = chrome.i18n.getMessage('settingsTitle');
+        const apiKeyLabel = document.getElementById('apiKeyLabel');
+        if (apiKeyLabel) apiKeyLabel.textContent = chrome.i18n.getMessage('apiKeyLabel');
         this.apiKeyInput.placeholder = chrome.i18n.getMessage('apiKeyPlaceholder');
-        document.getElementById('apiKeyDescription')!.innerHTML = 
-            chrome.i18n.getMessage('apiKeyDescription') + ' <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">' + 
-            chrome.i18n.getMessage('getApiKeyLink') + '</a>';
+        const apiKeyDescription = document.getElementById('apiKeyDescription');
+        if (apiKeyDescription) apiKeyDescription.innerHTML = 
+            `${chrome.i18n.getMessage('apiKeyDescription')} <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">${chrome.i18n.getMessage('getApiKeyLink')}</a>`;
         this.fetchModelsButton.textContent = chrome.i18n.getMessage('fetchModelsButton');
-        document.getElementById('modelLabel')!.textContent = chrome.i18n.getMessage('modelLabel');
-        document.getElementById('selectModelOption')!.textContent = chrome.i18n.getMessage('selectModelPlaceholder');
+        const modelLabel = document.getElementById('modelLabel');
+        if (modelLabel) modelLabel.textContent = chrome.i18n.getMessage('modelLabel');
+        const selectModelOption = document.getElementById('selectModelOption');
+        if (selectModelOption) selectModelOption.textContent = chrome.i18n.getMessage('selectModelPlaceholder');
         this.saveButton.textContent = chrome.i18n.getMessage('saveSettingsButton');
     }
 
@@ -150,7 +155,7 @@ class OptionsPage {
                 
                 // Filter for GPT models and sort by name
                 const gptModels = models
-                    .filter((model: any) => {
+                    .filter((model: { id: string }) => {
                         const modelId = model.id.toLowerCase();
                         return modelId.includes('gpt') &&
                                !modelId.includes('image') &&
@@ -161,7 +166,7 @@ class OptionsPage {
                                !modelId.includes('tts') &&
                                !modelId.includes('realtime');
                     })
-                    .map((model: any) => model.id)
+                    .map((model: { id: string }) => model.id)
                     .sort();
 
                 if (gptModels.length === 0) {
