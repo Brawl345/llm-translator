@@ -121,5 +121,26 @@
     },
     "failedToFetchModelsGeneric": {
         "message": "Failed to fetch models. Please check your internet connection and API key."
+    },
+    "additionalContextButton": {
+        "message": "Additional Context"
+    },
+    "additionalContextLabel": {
+        "message": "Additional Context"
+    },
+    "gettingContextStatus": {
+        "message": "Getting additional context..."
+    },
+    "contextFailedError": {
+        "message": "Failed to get additional context: $ERROR_MESSAGE$",
+        "placeholders": {
+            "error_message": {
+                "content": "$1",
+                "example": "Invalid API key"
+            }
+        }
+    },
+    "noContextNeeded": {
+        "message": "Keine zusätzlichen kulturellen oder sprachlichen Erklärungen erforderlich."
     }
 }

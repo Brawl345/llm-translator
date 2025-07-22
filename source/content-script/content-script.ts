@@ -1,10 +1,19 @@
-import type { ShowModalMessage, TranslationStreamMessage, TranslationError } from '../shared/types.js';
+import type { 
+    ShowModalMessage, 
+    TranslationStreamMessage, 
+    ContextSuccessMessage,
+    ContextErrorMessage,
+    GetAdditionalContextMessage,
+    TranslationError 
+} from '../shared/types.js';
 
 class TranslationModal {
     private modal: HTMLElement | null = null;
     private isVisible = false;
     private currentTranslation = '';
     private isStreaming = false;
+    private currentOriginalText = '';
+    private hasTranslation = false;
 
     constructor() {
         this.createModal();
@@ -39,6 +48,14 @@ class TranslationModal {
                                 </div>
                             </div>
                         </div>
+                        <div class="llm-text-section llm-context-section" style="display: none;">
+                            <div class="llm-context-header">
+                                <h4>${chrome.i18n.getMessage('additionalContextLabel')}</h4>
+                                <button class="llm-context-button" id="get-context-btn">${chrome.i18n.getMessage('additionalContextButton')}</button>
+                            </div>
+                            <div class="llm-text-content" id="context-text" style="display: none;">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -49,6 +66,7 @@ class TranslationModal {
 
         const closeButton = this.modal.querySelector('.llm-modal-close') as HTMLElement;
         const overlay = this.modal.querySelector('.llm-modal-overlay') as HTMLElement;
+        const contextButton = this.modal.querySelector('#get-context-btn') as HTMLElement;
 
         closeButton.addEventListener('click', () => this.hide());
         overlay.addEventListener('click', (e) => {
@@ -56,6 +74,8 @@ class TranslationModal {
                 this.hide();
             }
         });
+
+        contextButton.addEventListener('click', () => this.requestAdditionalContext());
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isVisible) {
@@ -259,6 +279,49 @@ class TranslationModal {
                 font-style: normal;
             }
 
+            .llm-context-section {
+                border-top: 1px solid #e2e8f0;
+                padding-top: 20px;
+            }
+
+            .llm-context-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 12px;
+            }
+
+            .llm-context-header h4 {
+                margin: 0;
+            }
+
+            .llm-context-button {
+                background: #667eea;
+                border: none;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .llm-context-button:hover:not(:disabled) {
+                background: #5a67d8;
+                transform: translateY(-1px);
+            }
+
+            .llm-context-button:active {
+                transform: translateY(0);
+            }
+
+            .llm-context-button:disabled {
+                background: #a0aec0;
+                cursor: not-allowed;
+                transform: none;
+            }
+
             @media (max-width: 640px) {
                 .llm-modal-overlay {
                     padding: 10px;
@@ -279,11 +342,15 @@ class TranslationModal {
     }
 
     private setupMessageListener(): void {
-        chrome.runtime.onMessage.addListener((message: ShowModalMessage | TranslationStreamMessage) => {
+        chrome.runtime.onMessage.addListener((message: ShowModalMessage | TranslationStreamMessage | ContextSuccessMessage | ContextErrorMessage) => {
             if (message.type === 'SHOW_MODAL') {
                 this.show((message as ShowModalMessage).payload);
             } else if (message.type === 'TRANSLATION_STREAM') {
                 this.handleStreamChunk((message as TranslationStreamMessage).payload);
+            } else if (message.type === 'CONTEXT_SUCCESS') {
+                this.handleContextSuccess((message as ContextSuccessMessage).payload);
+            } else if (message.type === 'CONTEXT_ERROR') {
+                this.handleContextError((message as ContextErrorMessage).payload);
             }
         });
     }
@@ -299,8 +366,10 @@ class TranslationModal {
 
         const originalTextEl = this.modal.querySelector('#original-text') as HTMLElement;
         const translatedTextEl = this.modal.querySelector('#translated-text') as HTMLElement;
+        const contextSection = this.modal.querySelector('.llm-context-section') as HTMLElement;
 
         originalTextEl.textContent = payload.originalText;
+        this.currentOriginalText = payload.originalText;
 
         if (payload.isStreaming) {
             this.isStreaming = true;
@@ -327,7 +396,10 @@ class TranslationModal {
             `;
         } else if (payload.translatedText) {
             this.isStreaming = false;
+            this.currentTranslation = payload.translatedText;
+            this.hasTranslation = true;
             translatedTextEl.textContent = payload.translatedText;
+            contextSection.style.display = 'block';
         }
 
         this.modal.style.display = 'block';
@@ -352,8 +424,12 @@ class TranslationModal {
 
         if (payload.isComplete) {
             this.isStreaming = false;
+            this.hasTranslation = true;
             // Final update with complete text
             translatedTextEl.textContent = this.currentTranslation;
+            // Show context section when streaming is complete
+            const contextSection = this.modal.querySelector('.llm-context-section') as HTMLElement;
+            contextSection.style.display = 'block';
         } else {
             // Append the new chunk
             this.currentTranslation += payload.chunk;
@@ -361,11 +437,94 @@ class TranslationModal {
         }
     }
 
+    private requestAdditionalContext(): void {
+        if (!this.hasTranslation || !this.currentOriginalText || !this.currentTranslation) return;
+
+        const contextButton = this.modal?.querySelector('#get-context-btn') as HTMLButtonElement;
+        const contextTextEl = this.modal?.querySelector('#context-text') as HTMLElement;
+
+        if (!contextButton || !contextTextEl) return;
+
+        // Disable button and show loading state
+        contextButton.disabled = true;
+        contextButton.textContent = chrome.i18n.getMessage('gettingContextStatus');
+        
+        // Show the context area with loading
+        contextTextEl.style.display = 'block';
+        contextTextEl.innerHTML = `
+            <div class="llm-loading">
+                <div class="llm-spinner"></div>
+                <span>${chrome.i18n.getMessage('gettingContextStatus')}</span>
+            </div>
+        `;
+
+        // Send message to service worker
+        const message: GetAdditionalContextMessage = {
+            type: 'GET_ADDITIONAL_CONTEXT',
+            payload: {
+                originalText: this.currentOriginalText,
+                translatedText: this.currentTranslation
+            }
+        };
+
+        chrome.runtime.sendMessage(message);
+    }
+
+    private handleContextSuccess(payload: { originalText: string; contextText: string }): void {
+        if (!this.modal || payload.originalText !== this.currentOriginalText) return;
+
+        const contextButton = this.modal.querySelector('#get-context-btn') as HTMLButtonElement;
+        const contextTextEl = this.modal.querySelector('#context-text') as HTMLElement;
+
+        if (!contextButton || !contextTextEl) return;
+
+        // Restore button
+        contextButton.disabled = false;
+        contextButton.textContent = chrome.i18n.getMessage('additionalContextButton');
+
+        // Show context
+        contextTextEl.textContent = payload.contextText;
+    }
+
+    private handleContextError(payload: { originalText: string; error: TranslationError }): void {
+        if (!this.modal || payload.originalText !== this.currentOriginalText) return;
+
+        const contextButton = this.modal.querySelector('#get-context-btn') as HTMLButtonElement;
+        const contextTextEl = this.modal.querySelector('#context-text') as HTMLElement;
+
+        if (!contextButton || !contextTextEl) return;
+
+        // Restore button
+        contextButton.disabled = false;
+        contextButton.textContent = chrome.i18n.getMessage('additionalContextButton');
+
+        // Show error
+        contextTextEl.innerHTML = `
+            <div class="llm-error">
+                ${payload.error.message}
+            </div>
+        `;
+    }
+
     private hide(): void {
         if (!this.modal) return;
 
         this.modal.style.display = 'none';
         this.isVisible = false;
+        this.hasTranslation = false;
+        this.currentOriginalText = '';
+        this.currentTranslation = '';
+
+        // Reset context section
+        const contextSection = this.modal.querySelector('.llm-context-section') as HTMLElement;
+        const contextTextEl = this.modal.querySelector('#context-text') as HTMLElement;
+        const contextButton = this.modal.querySelector('#get-context-btn') as HTMLButtonElement;
+        
+        contextSection.style.display = 'none';
+        contextTextEl.style.display = 'none';
+        contextTextEl.textContent = '';
+        contextButton.disabled = false;
+        contextButton.textContent = chrome.i18n.getMessage('additionalContextButton');
     }
 }
 

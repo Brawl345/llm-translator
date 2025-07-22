@@ -24,6 +24,9 @@ export type MessageType =
     | 'TRANSLATION_SUCCESS'
     | 'TRANSLATION_ERROR'
     | 'TRANSLATION_STREAM'
+    | 'GET_ADDITIONAL_CONTEXT'
+    | 'CONTEXT_SUCCESS'
+    | 'CONTEXT_ERROR'
     | 'SHOW_MODAL'
     | 'HIDE_MODAL';
 
@@ -53,6 +56,30 @@ export interface TranslationStreamMessage extends Message {
         originalText: string;
         chunk: string;
         isComplete: boolean;
+    };
+}
+
+export interface GetAdditionalContextMessage extends Message {
+    type: 'GET_ADDITIONAL_CONTEXT';
+    payload: {
+        originalText: string;
+        translatedText: string;
+    };
+}
+
+export interface ContextSuccessMessage extends Message {
+    type: 'CONTEXT_SUCCESS';
+    payload: {
+        originalText: string;
+        contextText: string;
+    };
+}
+
+export interface ContextErrorMessage extends Message {
+    type: 'CONTEXT_ERROR';
+    payload: {
+        originalText: string;
+        error: TranslationError;
     };
 }
 
