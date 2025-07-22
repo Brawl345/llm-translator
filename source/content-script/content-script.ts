@@ -25,8 +25,10 @@ class TranslationModal {
                     </div>
                     <div class="llm-modal-content">
                         <div class="llm-text-section">
-                            <h4>${chrome.i18n.getMessage('originalTextLabel')}</h4>
-                            <div class="llm-text-content" id="original-text"></div>
+                            <details class="llm-original-details">
+                                <summary>${chrome.i18n.getMessage('originalTextLabel')}</summary>
+                                <div class="llm-text-content" id="original-text"></div>
+                            </details>
                         </div>
                         <div class="llm-text-section">
                             <h4>${chrome.i18n.getMessage('translationLabel')}</h4>
@@ -173,6 +175,40 @@ class TranslationModal {
                 color: #4a5568;
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
+            }
+
+            .llm-original-details {
+                margin-bottom: 0;
+            }
+
+            .llm-original-details[open] {
+                margin-bottom: 12px;
+            }
+
+            .llm-original-details summary {
+                margin: 0;
+                font-size: 14px;
+                font-weight: 600;
+                color: #4a5568;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                cursor: pointer;
+                user-select: none;
+                padding: 4px 0;
+                border-radius: 4px;
+                transition: color 0.2s;
+            }
+
+            .llm-original-details summary:hover {
+                color: #2d3748;
+            }
+
+            .llm-original-details summary::-webkit-details-marker {
+                color: #667eea;
+            }
+
+            .llm-original-details[open] summary {
+                margin-bottom: 12px;
             }
 
             .llm-text-content {
