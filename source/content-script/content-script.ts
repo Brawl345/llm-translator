@@ -3,6 +3,7 @@ import type {
     TranslationStreamMessage, 
     ContextSuccessMessage,
     ContextErrorMessage,
+    ContextStreamMessage,
     GetAdditionalContextMessage,
     TranslationError 
 } from '../shared/types.js';
@@ -14,6 +15,8 @@ class TranslationModal {
     private isStreaming = false;
     private currentOriginalText = '';
     private hasTranslation = false;
+    private isContextStreaming = false;
+    private currentContext = '';
 
     constructor() {
         this.createModal();
@@ -342,7 +345,7 @@ class TranslationModal {
     }
 
     private setupMessageListener(): void {
-        chrome.runtime.onMessage.addListener((message: ShowModalMessage | TranslationStreamMessage | ContextSuccessMessage | ContextErrorMessage) => {
+        chrome.runtime.onMessage.addListener((message: ShowModalMessage | TranslationStreamMessage | ContextSuccessMessage | ContextErrorMessage | ContextStreamMessage) => {
             if (message.type === 'SHOW_MODAL') {
                 this.show((message as ShowModalMessage).payload);
             } else if (message.type === 'TRANSLATION_STREAM') {
@@ -351,6 +354,8 @@ class TranslationModal {
                 this.handleContextSuccess((message as ContextSuccessMessage).payload);
             } else if (message.type === 'CONTEXT_ERROR') {
                 this.handleContextError((message as ContextErrorMessage).payload);
+            } else if (message.type === 'CONTEXT_STREAM') {
+                this.handleContextStreamChunk((message as ContextStreamMessage).payload);
             }
         });
     }
@@ -445,6 +450,10 @@ class TranslationModal {
 
         if (!contextButton || !contextTextEl) return;
 
+        // Initialize context streaming
+        this.isContextStreaming = true;
+        this.currentContext = '';
+
         // Disable button and show loading state
         contextButton.disabled = true;
         contextButton.textContent = chrome.i18n.getMessage('gettingContextStatus');
@@ -468,6 +477,31 @@ class TranslationModal {
         };
 
         chrome.runtime.sendMessage(message);
+    }
+
+    private handleContextStreamChunk(payload: {
+        originalText: string;
+        chunk: string;
+        isComplete: boolean;
+    }): void {
+        if (!this.modal || !this.isContextStreaming || payload.originalText !== this.currentOriginalText) return;
+
+        const contextTextEl = this.modal.querySelector('#context-text') as HTMLElement;
+        const contextButton = this.modal.querySelector('#get-context-btn') as HTMLButtonElement;
+
+        if (!contextTextEl || !contextButton) return;
+
+        if (payload.isComplete) {
+            this.isContextStreaming = false;
+            // Remove button since context is now complete
+            contextButton.style.display = 'none';
+            // Final update with complete text
+            contextTextEl.textContent = this.currentContext;
+        } else {
+            // Append the new chunk
+            this.currentContext += payload.chunk;
+            contextTextEl.textContent = this.currentContext;
+        }
     }
 
     private handleContextSuccess(payload: { originalText: string; contextText: string }): void {
@@ -494,6 +528,10 @@ class TranslationModal {
 
         if (!contextButton || !contextTextEl) return;
 
+        // Reset streaming state
+        this.isContextStreaming = false;
+        this.currentContext = '';
+
         // Restore button
         contextButton.disabled = false;
         contextButton.textContent = chrome.i18n.getMessage('additionalContextButton');
@@ -514,6 +552,8 @@ class TranslationModal {
         this.hasTranslation = false;
         this.currentOriginalText = '';
         this.currentTranslation = '';
+        this.isContextStreaming = false;
+        this.currentContext = '';
 
         // Reset context section
         const contextSection = this.modal.querySelector('.llm-context-section') as HTMLElement;
@@ -524,6 +564,7 @@ class TranslationModal {
         contextTextEl.style.display = 'none';
         contextTextEl.textContent = '';
         contextButton.disabled = false;
+        contextButton.style.display = 'inline-block';
         contextButton.textContent = chrome.i18n.getMessage('additionalContextButton');
     }
 }

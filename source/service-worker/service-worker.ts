@@ -5,7 +5,8 @@ import type {
     TranslationStreamMessage,
     GetAdditionalContextMessage,
     ContextSuccessMessage,
-    ContextErrorMessage
+    ContextErrorMessage,
+    ContextStreamMessage
 } from '../shared/types.js';
 
 const CONTEXT_MENU_ID = 'translate-text';
@@ -47,20 +48,11 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message.type === 'GET_ADDITIONAL_CONTEXT' && sender.tab?.id) {
         const contextMessage = message as GetAdditionalContextMessage;
         try {
-            const contextText = await getAdditionalContext(
+            await getAdditionalContextStream(
                 contextMessage.payload.originalText,
-                contextMessage.payload.translatedText
+                contextMessage.payload.translatedText,
+                sender.tab.id
             );
-            
-            const successMessage: ContextSuccessMessage = {
-                type: 'CONTEXT_SUCCESS',
-                payload: {
-                    originalText: contextMessage.payload.originalText,
-                    contextText
-                }
-            };
-            
-            await chrome.tabs.sendMessage(sender.tab.id, successMessage);
         } catch (error) {
             const errorMessage: ContextErrorMessage = {
                 type: 'CONTEXT_ERROR',
@@ -107,6 +99,24 @@ async function sendStreamChunk(
 ): Promise<void> {
     const message: TranslationStreamMessage = {
         type: 'TRANSLATION_STREAM',
+        payload: {
+            originalText,
+            chunk,
+            isComplete,
+        },
+    };
+
+    await chrome.tabs.sendMessage(tabId, message);
+}
+
+async function sendContextStreamChunk(
+    tabId: number,
+    originalText: string,
+    chunk: string,
+    isComplete: boolean
+): Promise<void> {
+    const message: ContextStreamMessage = {
+        type: 'CONTEXT_STREAM',
         payload: {
             originalText,
             chunk,
@@ -215,7 +225,7 @@ Translate the following text to German:`;
     }
 }
 
-async function getAdditionalContext(originalText: string, translatedText: string): Promise<string> {
+async function getAdditionalContextStream(originalText: string, translatedText: string, tabId: number): Promise<void> {
     const settings = await getSettings();
     
     if (!settings.apiKey) {
@@ -257,6 +267,7 @@ Explain rarely known words, slang, or cultural context in German:`;
             ],
             max_tokens: 300,
             temperature: 0.3,
+            stream: true,
         }),
     });
 
@@ -266,14 +277,53 @@ Explain rarely known words, slang, or cultural context in German:`;
         throw new Error(chrome.i18n.getMessage('contextFailedError', errorMessage));
     }
 
-    const data = await response.json();
-    const contextText = data.choices?.[0]?.message?.content?.trim();
-
-    if (!contextText) {
-        throw new Error('No additional context received from the API');
+    const reader = response.body?.getReader();
+    if (!reader) {
+        throw new Error('Failed to get context stream reader');
     }
 
-    return contextText;
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    try {
+        while (true) {
+            const { done, value } = await reader.read();
+            
+            if (done) {
+                await sendContextStreamChunk(tabId, originalText, '', true);
+                break;
+            }
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                    const data = line.slice(6).trim();
+                    
+                    if (data === '[DONE]') {
+                        await sendContextStreamChunk(tabId, originalText, '', true);
+                        return;
+                    }
+
+                    try {
+                        const parsed = JSON.parse(data);
+                        const chunk = parsed.choices?.[0]?.delta?.content || '';
+                        
+                        if (chunk) {
+                            await sendContextStreamChunk(tabId, originalText, chunk, false);
+                        }
+                    } catch (_error) {
+                        // Skip invalid JSON chunks
+                        continue;
+                    }
+                }
+            }
+        }
+    } finally {
+        reader.releaseLock();
+    }
 }
 
 async function getSettings(): Promise<Settings> {

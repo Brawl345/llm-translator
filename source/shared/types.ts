@@ -27,6 +27,7 @@ export type MessageType =
     | 'GET_ADDITIONAL_CONTEXT'
     | 'CONTEXT_SUCCESS'
     | 'CONTEXT_ERROR'
+    | 'CONTEXT_STREAM'
     | 'SHOW_MODAL'
     | 'HIDE_MODAL';
 
@@ -80,6 +81,15 @@ export interface ContextErrorMessage extends Message {
     payload: {
         originalText: string;
         error: TranslationError;
+    };
+}
+
+export interface ContextStreamMessage extends Message {
+    type: 'CONTEXT_STREAM';
+    payload: {
+        originalText: string;
+        chunk: string;
+        isComplete: boolean;
     };
 }
 
