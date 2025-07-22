@@ -1,0 +1,8 @@
+{
+    "extensionName": {
+        "message": "LLM Translator"
+    },
+    "extensionDescription": {
+        "message": "Translate text using an LLM"
+    }
+}

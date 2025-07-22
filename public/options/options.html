@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>LLM Translator Settings</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <form id="settingsForm">
+        <fieldset>
+            <legend>LLM Translator Settings</legend>
+            
+            <p>
+                <label for="apiKey">OpenAI API Key:</label><br>
+                <input 
+                    type="password" 
+                    id="apiKey" 
+                    name="apiKey" 
+                    placeholder="sk-..." 
+                    autocomplete="off"
+                    spellcheck="false"
+                    style="width: 300px;"
+                >
+            </p>
+            
+            <p style="font-size: 0.9em; color: #666;">
+                Your API key is stored securely and only used for translation requests.
+                <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">Get your API key</a>
+            </p>
+
+            <p>
+                <button type="button" id="fetchModelsBtn">Fetch Models</button>
+            </p>
+
+            <p>
+                <label for="model">Model:</label><br>
+                <select id="model" name="model">
+                    <option value="">Select a model...</option>
+                </select>
+            </p>
+
+            <p>
+                <button type="submit" id="saveBtn">Save Settings</button>
+            </p>
+
+            <div id="status" style="display: none; margin-top: 10px; padding: 5px; border-radius: 3px;"></div>
+        </fieldset>
+    </form>
+
+    <script type="module" src="../build/options/options.js"></script>
+</body>
+</html>

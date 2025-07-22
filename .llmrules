@@ -1,0 +1,29 @@
+# LLM Translator
+
+## Overview
+
+- WebExtension which adds an option to the context menu to translate selected text via GPT-4.1.
+- Code is written in TypeScript
+- Linted with Biome
+- Built with web-ext
+
+## Source code structure
+
+- `source/`: Source code
+  - `service-worker/`: Service worker code
+  - `options/`: Options page
+- `public/`: Built code
+  - `build/`: Built JavaScript and CSS
+  - `_locales/`: Localizations
+  - `manifest.json`: Manifest
+  - `icons/`: Icons
+
+## Build
+
+Build with `npm run build`. Never run the `start:BROWSER` commands, the user will do it manually. Lint with the `npm run lint:types` for TypeScript and `npm run lint:code` for Biome. Do not use `npm run dev` as it will start a long running watch commands - just use `npm run build`.
+
+## Important to note
+
+For every string, add the localization to `public/_locales/LOCALE/messages.json` and use the `getMessage` function to retrieve it. Do not hardcode any strings in the code. Translate the strings in all languages. For German, use the informal (Du) version.
+
+Only add tests for core code and when neccessary.
