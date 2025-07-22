@@ -1,8 +1,10 @@
-import type { ShowModalMessage, TranslationError } from '../shared/types.js';
+import type { ShowModalMessage, TranslationStreamMessage, TranslationError } from '../shared/types.js';
 
 class TranslationModal {
     private modal: HTMLElement | null = null;
     private isVisible = false;
+    private currentTranslation = '';
+    private isStreaming = false;
 
     constructor() {
         this.createModal();
@@ -241,9 +243,11 @@ class TranslationModal {
     }
 
     private setupMessageListener(): void {
-        chrome.runtime.onMessage.addListener((message: ShowModalMessage) => {
+        chrome.runtime.onMessage.addListener((message: ShowModalMessage | TranslationStreamMessage) => {
             if (message.type === 'SHOW_MODAL') {
-                this.show(message.payload);
+                this.show((message as ShowModalMessage).payload);
+            } else if (message.type === 'TRANSLATION_STREAM') {
+                this.handleStreamChunk((message as TranslationStreamMessage).payload);
             }
         });
     }
@@ -253,6 +257,7 @@ class TranslationModal {
         translatedText?: string;
         loading?: boolean;
         error?: TranslationError;
+        isStreaming?: boolean;
     }): void {
         if (!this.modal) return;
 
@@ -261,7 +266,16 @@ class TranslationModal {
 
         originalTextEl.textContent = payload.originalText;
 
-        if (payload.loading) {
+        if (payload.isStreaming) {
+            this.isStreaming = true;
+            this.currentTranslation = '';
+            translatedTextEl.innerHTML = `
+                <div class="llm-loading">
+                    <div class="llm-spinner"></div>
+                    <span>Translating...</span>
+                </div>
+            `;
+        } else if (payload.loading) {
             translatedTextEl.innerHTML = `
                 <div class="llm-loading">
                     <div class="llm-spinner"></div>
@@ -269,12 +283,14 @@ class TranslationModal {
                 </div>
             `;
         } else if (payload.error) {
+            this.isStreaming = false;
             translatedTextEl.innerHTML = `
                 <div class="llm-error">
                     ${payload.error.message}
                 </div>
             `;
         } else if (payload.translatedText) {
+            this.isStreaming = false;
             translatedTextEl.textContent = payload.translatedText;
         }
 
@@ -287,6 +303,26 @@ class TranslationModal {
                 container.focus();
             }
         }, 100);
+    }
+
+    private handleStreamChunk(payload: {
+        originalText: string;
+        chunk: string;
+        isComplete: boolean;
+    }): void {
+        if (!this.modal || !this.isStreaming) return;
+
+        const translatedTextEl = this.modal.querySelector('#translated-text') as HTMLElement;
+
+        if (payload.isComplete) {
+            this.isStreaming = false;
+            // Final update with complete text
+            translatedTextEl.textContent = this.currentTranslation;
+        } else {
+            // Append the new chunk
+            this.currentTranslation += payload.chunk;
+            translatedTextEl.textContent = this.currentTranslation;
+        }
     }
 
     private hide(): void {

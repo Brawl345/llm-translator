@@ -23,6 +23,7 @@ export type MessageType =
     | 'TRANSLATE_TEXT'
     | 'TRANSLATION_SUCCESS'
     | 'TRANSLATION_ERROR'
+    | 'TRANSLATION_STREAM'
     | 'SHOW_MODAL'
     | 'HIDE_MODAL';
 
@@ -46,6 +47,15 @@ export interface TranslationErrorMessage extends Message {
     payload: TranslationError;
 }
 
+export interface TranslationStreamMessage extends Message {
+    type: 'TRANSLATION_STREAM';
+    payload: {
+        originalText: string;
+        chunk: string;
+        isComplete: boolean;
+    };
+}
+
 export interface ShowModalMessage extends Message {
     type: 'SHOW_MODAL';
     payload: {
@@ -53,5 +63,6 @@ export interface ShowModalMessage extends Message {
         translatedText?: string;
         loading?: boolean;
         error?: TranslationError;
+        isStreaming?: boolean;
     };
 }
