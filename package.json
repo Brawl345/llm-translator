@@ -14,8 +14,7 @@
     "lint:types": "tsc --project tsconfig.json",
     "lint:code": "biome lint",
     "lint:web-ext": "npm run build && web-ext lint",
-    "web-ext:build": "npm run build && web-ext build --overwrite-dest",
-    "web-ext:upload": "npm run web-ext:build && web-ext sign --channel=listed"
+    "web-ext:build": "npm run build && web-ext build --overwrite-dest"
   },
   "webExt": {
     "sourceDir": "./public/",
