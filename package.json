@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "author": "Brawl345",
   "license": "Unlicense",
+  "repository": {
+    "url": "https://github.com/Brawl345/llm-translator"
+  },
   "main": "source/service-worker/service-worker.js",
   "type": "module",
   "scripts": {
