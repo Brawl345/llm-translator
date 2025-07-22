@@ -4,5 +4,122 @@
     },
     "extensionDescription": {
         "message": "Translate text using an LLM"
+    },
+    "contextMenuTitle": {
+        "message": "Translate via LLM"
+    },
+    "noApiKeyError": {
+        "message": "No API key configured. Please set up your OpenAI API key in the extension options."
+    },
+    "translationFailedError": {
+        "message": "Translation failed: $ERROR_MESSAGE$",
+        "placeholders": {
+            "error_message": {
+                "content": "$1",
+                "example": "Invalid API key"
+            }
+        }
+    },
+    "noTranslationError": {
+        "message": "No translation received from the API"
+    },
+    "streamReaderError": {
+        "message": "Failed to get response reader"
+    },
+    "modalTitle": {
+        "message": "LLM Translation"
+    },
+    "originalTextLabel": {
+        "message": "Original Text"
+    },
+    "translationLabel": {
+        "message": "Translation"
+    },
+    "translatingStatus": {
+        "message": "Translating..."
+    },
+    "closeButtonLabel": {
+        "message": "Close"
+    },
+    "settingsTitle": {
+        "message": "LLM Translator Settings"
+    },
+    "apiKeyLabel": {
+        "message": "OpenAI API Key:"
+    },
+    "apiKeyPlaceholder": {
+        "message": "sk-..."
+    },
+    "apiKeyDescription": {
+        "message": "Your API key is stored securely and only used for translation requests."
+    },
+    "getApiKeyLink": {
+        "message": "Get your API key"
+    },
+    "fetchModelsButton": {
+        "message": "Fetch Models"
+    },
+    "fetchingModelsButton": {
+        "message": "Fetching Models..."
+    },
+    "modelLabel": {
+        "message": "Model:"
+    },
+    "selectModelPlaceholder": {
+        "message": "Select a model..."
+    },
+    "saveSettingsButton": {
+        "message": "Save Settings"
+    },
+    "savingSettingsButton": {
+        "message": "Saving..."
+    },
+    "failedToLoadSettings": {
+        "message": "Failed to load settings"
+    },
+    "pleaseEnterApiKey": {
+        "message": "Please enter an API key"
+    },
+    "invalidApiKeyFormat": {
+        "message": "Invalid API key format. OpenAI API keys start with \"sk-\""
+    },
+    "pleaseSelectModel": {
+        "message": "Please select a model"
+    },
+    "settingsSavedSuccess": {
+        "message": "Settings saved successfully!"
+    },
+    "failedToSaveSettings": {
+        "message": "Failed to save settings. Please try again."
+    },
+    "pleaseEnterApiKeyFirst": {
+        "message": "Please enter an API key first"
+    },
+    "fetchingModelsStatus": {
+        "message": "Fetching available models..."
+    },
+    "noGptModelsFound": {
+        "message": "No GPT models found in your account"
+    },
+    "modelsFoundSuccess": {
+        "message": "Found $COUNT$ GPT models. Please select one.",
+        "placeholders": {
+            "count": {
+                "content": "$1",
+                "example": "5"
+            }
+        }
+    },
+    "failedToFetchModels": {
+        "message": "Failed to fetch models: $ERROR_MESSAGE$",
+        "placeholders": {
+            "error_message": {
+                "content": "$1",
+                "example": "Invalid API key"
+            }
+        }
+    },
+    "failedToFetchModelsGeneric": {
+        "message": "Failed to fetch models. Please check your internet connection and API key."
     }
 }

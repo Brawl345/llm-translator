@@ -20,20 +20,20 @@ class TranslationModal {
             <div class="llm-modal-overlay">
                 <div class="llm-modal-container">
                     <div class="llm-modal-header">
-                        <h3>LLM Translation</h3>
-                        <button class="llm-modal-close" aria-label="Close">&times;</button>
+                        <h3>${chrome.i18n.getMessage('modalTitle')}</h3>
+                        <button class="llm-modal-close" aria-label="${chrome.i18n.getMessage('closeButtonLabel')}">&times;</button>
                     </div>
                     <div class="llm-modal-content">
                         <div class="llm-text-section">
-                            <h4>Original Text</h4>
+                            <h4>${chrome.i18n.getMessage('originalTextLabel')}</h4>
                             <div class="llm-text-content" id="original-text"></div>
                         </div>
                         <div class="llm-text-section">
-                            <h4>Translation</h4>
+                            <h4>${chrome.i18n.getMessage('translationLabel')}</h4>
                             <div class="llm-text-content" id="translated-text">
                                 <div class="llm-loading">
                                     <div class="llm-spinner"></div>
-                                    <span>Translating...</span>
+                                    <span>${chrome.i18n.getMessage('translatingStatus')}</span>
                                 </div>
                             </div>
                         </div>
@@ -272,14 +272,14 @@ class TranslationModal {
             translatedTextEl.innerHTML = `
                 <div class="llm-loading">
                     <div class="llm-spinner"></div>
-                    <span>Translating...</span>
+                    <span>${chrome.i18n.getMessage('translatingStatus')}</span>
                 </div>
             `;
         } else if (payload.loading) {
             translatedTextEl.innerHTML = `
                 <div class="llm-loading">
                     <div class="llm-spinner"></div>
-                    <span>Translating...</span>
+                    <span>${chrome.i18n.getMessage('translatingStatus')}</span>
                 </div>
             `;
         } else if (payload.error) {

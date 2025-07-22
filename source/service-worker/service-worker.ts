@@ -10,7 +10,7 @@ const CONTEXT_MENU_ID = 'translate-text';
 chrome.runtime.onInstalled.addListener(async () => {
     chrome.contextMenus.create({
         id: CONTEXT_MENU_ID,
-        title: 'Translate via LLM',
+        title: chrome.i18n.getMessage('contextMenuTitle'),
         contexts: ['selection'],
     });
 
@@ -84,7 +84,7 @@ async function translateTextStream(text: string, tabId: number): Promise<void> {
     const settings = await getSettings();
     
     if (!settings.apiKey) {
-        throw new Error('No API key configured. Please set up your OpenAI API key in the extension options.');
+        throw new Error(chrome.i18n.getMessage('noApiKeyError'));
     }
 
     const systemPrompt = `You are a professional translator. Your task is to translate the given text into German while preserving the original meaning, tone, and context. 
@@ -126,12 +126,12 @@ Translate the following text to German:`;
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         const errorMessage = errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`;
-        throw new Error(`Translation failed: ${errorMessage}`);
+        throw new Error(chrome.i18n.getMessage('translationFailedError', errorMessage));
     }
 
     const reader = response.body?.getReader();
     if (!reader) {
-        throw new Error('Failed to get response reader');
+        throw new Error(chrome.i18n.getMessage('streamReaderError'));
     }
 
     const decoder = new TextDecoder();

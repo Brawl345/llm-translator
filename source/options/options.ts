@@ -19,8 +19,23 @@ class OptionsPage {
         this.fetchModelsButton = document.getElementById('fetchModelsBtn') as HTMLButtonElement;
         this.statusDiv = document.getElementById('status') as HTMLElement;
 
+        this.localizeUI();
         this.initializeEventListeners();
         this.loadSettings();
+    }
+
+    private localizeUI(): void {
+        document.getElementById('pageTitle')!.textContent = chrome.i18n.getMessage('settingsTitle');
+        document.getElementById('settingsLegend')!.textContent = chrome.i18n.getMessage('settingsTitle');
+        document.getElementById('apiKeyLabel')!.textContent = chrome.i18n.getMessage('apiKeyLabel');
+        this.apiKeyInput.placeholder = chrome.i18n.getMessage('apiKeyPlaceholder');
+        document.getElementById('apiKeyDescription')!.innerHTML = 
+            chrome.i18n.getMessage('apiKeyDescription') + ' <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">' + 
+            chrome.i18n.getMessage('getApiKeyLink') + '</a>';
+        this.fetchModelsButton.textContent = chrome.i18n.getMessage('fetchModelsButton');
+        document.getElementById('modelLabel')!.textContent = chrome.i18n.getMessage('modelLabel');
+        document.getElementById('selectModelOption')!.textContent = chrome.i18n.getMessage('selectModelPlaceholder');
+        this.saveButton.textContent = chrome.i18n.getMessage('saveSettingsButton');
     }
 
     private initializeEventListeners(): void {
@@ -61,7 +76,7 @@ class OptionsPage {
                 this.modelSelect.value = result.model;
             }
         } catch (_error) {
-            this.showStatus('Failed to load settings', 'error');
+            this.showStatus(chrome.i18n.getMessage('failedToLoadSettings'), 'error');
         }
     }
 
@@ -70,22 +85,22 @@ class OptionsPage {
         const model = this.modelSelect.value;
 
         if (!apiKey) {
-            this.showStatus('Please enter an API key', 'error');
+            this.showStatus(chrome.i18n.getMessage('pleaseEnterApiKey'), 'error');
             return;
         }
 
         if (!apiKey.startsWith('sk-')) {
-            this.showStatus('Invalid API key format. OpenAI API keys start with "sk-"', 'error');
+            this.showStatus(chrome.i18n.getMessage('invalidApiKeyFormat'), 'error');
             return;
         }
 
         if (!model) {
-            this.showStatus('Please select a model', 'error');
+            this.showStatus(chrome.i18n.getMessage('pleaseSelectModel'), 'error');
             return;
         }
 
         this.saveButton.disabled = true;
-        this.saveButton.textContent = 'Saving...';
+        this.saveButton.textContent = chrome.i18n.getMessage('savingSettingsButton');
 
         try {
             const settings: Settings = {
@@ -94,12 +109,12 @@ class OptionsPage {
             };
 
             await chrome.storage.sync.set(settings);
-            this.showStatus('Settings saved successfully!', 'success');
+            this.showStatus(chrome.i18n.getMessage('settingsSavedSuccess'), 'success');
         } catch (_error) {
-            this.showStatus('Failed to save settings. Please try again.', 'error');
+            this.showStatus(chrome.i18n.getMessage('failedToSaveSettings'), 'error');
         } finally {
             this.saveButton.disabled = false;
-            this.saveButton.textContent = 'Save Settings';
+            this.saveButton.textContent = chrome.i18n.getMessage('saveSettingsButton');
         }
     }
 
@@ -107,18 +122,18 @@ class OptionsPage {
         const apiKey = this.apiKeyInput.value.trim();
 
         if (!apiKey) {
-            this.showStatus('Please enter an API key first', 'error');
+            this.showStatus(chrome.i18n.getMessage('pleaseEnterApiKeyFirst'), 'error');
             return;
         }
 
         if (!apiKey.startsWith('sk-')) {
-            this.showStatus('Invalid API key format. OpenAI API keys start with "sk-"', 'error');
+            this.showStatus(chrome.i18n.getMessage('invalidApiKeyFormat'), 'error');
             return;
         }
 
         this.fetchModelsButton.disabled = true;
-        this.fetchModelsButton.textContent = 'Fetching Models...';
-        this.showStatus('Fetching available models...', 'info');
+        this.fetchModelsButton.textContent = chrome.i18n.getMessage('fetchingModelsButton');
+        this.showStatus(chrome.i18n.getMessage('fetchingModelsStatus'), 'info');
 
         try {
             const response = await fetch('https://api.openai.com/v1/models', {
@@ -150,7 +165,7 @@ class OptionsPage {
                     .sort();
 
                 if (gptModels.length === 0) {
-                    this.showStatus('No GPT models found in your account', 'error');
+                    this.showStatus(chrome.i18n.getMessage('noGptModelsFound'), 'error');
                     return;
                 }
 
@@ -158,17 +173,17 @@ class OptionsPage {
                 await chrome.storage.sync.set({ availableModels: gptModels });
 
                 this.populateModelDropdown(gptModels);
-                this.showStatus(`Found ${gptModels.length} GPT models. Please select one.`, 'success');
+                this.showStatus(chrome.i18n.getMessage('modelsFoundSuccess', String(gptModels.length)), 'success');
             } else {
                 const errorData = await response.json().catch(() => ({}));
                 const errorMessage = errorData.error?.message || `HTTP ${response.status}`;
-                this.showStatus(`Failed to fetch models: ${errorMessage}`, 'error');
+                this.showStatus(chrome.i18n.getMessage('failedToFetchModels', errorMessage), 'error');
             }
         } catch (_error) {
-            this.showStatus('Failed to fetch models. Please check your internet connection and API key.', 'error');
+            this.showStatus(chrome.i18n.getMessage('failedToFetchModelsGeneric'), 'error');
         } finally {
             this.fetchModelsButton.disabled = false;
-            this.fetchModelsButton.textContent = 'Fetch Models';
+            this.fetchModelsButton.textContent = chrome.i18n.getMessage('fetchModelsButton');
         }
     }
 
@@ -177,7 +192,7 @@ class OptionsPage {
         const currentModel = this.modelSelect.value;
         
         // Clear existing options except the placeholder
-        this.modelSelect.innerHTML = '<option value="">Select a model...</option>';
+        this.modelSelect.innerHTML = `<option value="">${chrome.i18n.getMessage('selectModelPlaceholder')}</option>`;
         
         // Add available models to dropdown
         models.forEach((modelId: string) => {
