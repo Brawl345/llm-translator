@@ -1,29 +1,54 @@
-# LLM Translator
+# LLM Guidance
+
+This file provides guidance to LLMs when working with code in this repository.
 
 ## Overview
 
-- WebExtension which adds an option to the context menu to translate selected text via GPT-4.1.
-- Code is written in TypeScript
-- Linted with Biome
-- Built with web-ext
+Chrome/Firefox web extension that provides context menu translation using OpenAI's API. Features streaming responses, additional cultural context, and comprehensive internationalization. Code is written in TypeScript, linted with Biome, and built with ESBuild.
 
-## Source code structure
+## Architecture
 
-- `source/`: Source code
-  - `service-worker/`: Service worker code
-  - `options/`: Options page
-- `public/`: Built code
-  - `build/`: Built JavaScript and CSS
-  - `_locales/`: Localizations
-  - `manifest.json`: Manifest
-  - `icons/`: Icons
+**Message-Driven System**: Extension uses Chrome runtime messaging for communication between service worker, content script, and options page. All message types and interfaces are defined in `source/shared/types.ts`.
 
-## Build
+**Key Components**:
+- **Service Worker** (`source/service-worker/`): Handles context menu, API calls, streaming responses, input validation, and message routing
+- **Content Script** (`source/content-script/`): Manages translation modal UI, handles streaming updates, and user interactions
+- **Options Page** (`source/options/`): Settings management, API key configuration, and model selection
+- **Shared Types** (`source/shared/types.ts`): TypeScript interfaces for all message passing and data structures
 
-Build with `npm run build`. Never run the `start:BROWSER` commands, the user will do it manually. Lint with the `npm run lint:types` for TypeScript and `npm run lint:code` for Biome. Do not use `npm run dev` as it will start a long running watch commands - just use `npm run build`.
+**Translation Flow**:
+1. User selects text → right-click → "Translate via LLM"
+2. Service worker validates input length against model context limits
+3. Opens modal via content script with streaming loading state
+4. Streams translation chunks in real-time using OpenAI streaming API
+5. Additional context feature allows cultural/linguistic explanations
 
-## Important to note
+**Streaming Architecture**: Both translation and additional context use server-sent event streaming with chunk-based updates. Content script handles real-time display updates while service worker manages stream parsing.
 
-For every string, add the localization to `public/_locales/LOCALE/messages.json` and use the `getMessage` function to retrieve it. Do not hardcode any strings in the code. Translate the strings in all languages. For German, use the informal (Du) version.
+## Build Commands
 
-Only add tests for core code and when neccessary.
+- `npm run build`: Production build (always use this, never `npm run dev`)
+- `npm run lint:types`: TypeScript type checking
+- `npm run lint:code`: Biome code linting
+- `npm run web-ext:build`: Build extension package
+- `npm run start:chrome` / `npm run start:firefox`: Launch in browser (user runs manually)
+
+## Internationalization
+
+All user-facing strings must be added to `public/_locales/en/messages.json` and accessed via `chrome.i18n.getMessage()`. Never hardcode strings. German translations use informal (Du) form. HTML placeholder keys use double-underscore format (`__keyName__`) for programmatic replacement.
+
+## Key Technical Details
+
+**Input Validation**: Text length validation prevents API errors by checking combined system prompt + user text against model context limits (4 chars/token estimation).
+
+**Model Support**: Dynamic model fetching with dropdown preservation during re-fetch. Filter out certain legacy and image/audio/tts/search/etc. models
+
+**UI Features**: 
+- Collapsible original text section
+- Streaming response display with loading states
+- Additional context button (hidden after successful completion)
+- Fixed header/footer layout with scrollable content area
+
+**Error Handling**: Comprehensive error states for API failures, network issues, and input validation with user-friendly messages.
+
+**Security**: Anti-prompt injection measures in system prompts. API keys stored securely via Chrome storage API.
