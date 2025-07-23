@@ -30,18 +30,52 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         
         if (!selectedText) return;
 
-        await showTranslationModal(tab.id, selectedText, false, undefined, undefined, true);
-        
-        try {
-            await translateTextStream(selectedText, tab.id);
-        } catch (error) {
-            const translationError: TranslationError = {
-                message: error instanceof Error ? error.message : 'Translation failed',
-            };
-            await showTranslationModal(tab.id, selectedText, false, undefined, translationError);
-        }
+        await handleTranslation(selectedText, tab.id);
     }
 });
+
+chrome.action.onClicked.addListener(async (tab) => {
+    if (!tab.id) return;
+
+    try {
+        const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: () => {
+                const selection = window.getSelection();
+                return selection ? selection.toString().trim() : '';
+            }
+        });
+
+        const selectedText = results[0]?.result;
+        
+        if (!selectedText) {
+            await showTranslationModal(tab.id, '', false, undefined, {
+                message: chrome.i18n.getMessage('noTextSelectedError')
+            });
+            return;
+        }
+
+        await handleTranslation(selectedText, tab.id);
+    } catch (error) {
+        const translationError: TranslationError = {
+            message: error instanceof Error ? error.message : 'Failed to get selected text',
+        };
+        await showTranslationModal(tab.id, '', false, undefined, translationError);
+    }
+});
+
+async function handleTranslation(selectedText: string, tabId: number): Promise<void> {
+    await showTranslationModal(tabId, selectedText, false, undefined, undefined, true);
+    
+    try {
+        await translateTextStream(selectedText, tabId);
+    } catch (error) {
+        const translationError: TranslationError = {
+            message: error instanceof Error ? error.message : 'Translation failed',
+        };
+        await showTranslationModal(tabId, selectedText, false, undefined, translationError);
+    }
+}
 
 chrome.runtime.onMessage.addListener(async (message, sender, _sendResponse) => {
     if (message.type === 'GET_ADDITIONAL_CONTEXT' && sender.tab?.id) {
