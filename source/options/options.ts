@@ -209,9 +209,9 @@ class OptionsPage {
                 const data = await response.json();
                 const models = data.data || [];
                 
-                // Filter for GPT models and sort by name
+                // Filter for GPT models and sort by created date
                 const gptModels = models
-                    .filter((model: { id: string }) => {
+                    .filter((model: { id: string; created: number }) => {
                         const modelId = model.id.toLowerCase();
                         return modelId.includes('gpt') &&
                                !modelId.includes('image') &&
@@ -222,8 +222,8 @@ class OptionsPage {
                                !modelId.includes('tts') &&
                                !modelId.includes('realtime');
                     })
-                    .map((model: { id: string }) => model.id)
-                    .sort();
+                    .sort((a: { created: number }, b: { created: number }) => b.created - a.created)
+                    .map((model: { id: string }) => model.id);
 
                 if (gptModels.length === 0) {
                     this.showStatus(chrome.i18n.getMessage('noGptModelsFound'), 'error');
