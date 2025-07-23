@@ -1,8 +1,10 @@
 .idea/
 node_modules/
+output/
 web-ext-artifacts/
 *.iml
 *.pem
 *.crx
+*.xpi
 public/_metadata
 public/build
