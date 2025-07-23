@@ -6,6 +6,144 @@
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: white;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1a202c;
+                color: #f7fafc;
+            }
+        }
+
+        fieldset {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            fieldset {
+                border: 1px solid #4a5568;
+                background-color: #2d3748;
+            }
+        }
+
+        legend {
+            color: #333;
+            font-weight: 600;
+            padding: 0 10px;
+            transition: color 0.3s;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            legend {
+                color: #f7fafc;
+            }
+        }
+
+        label {
+            color: #555;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            label {
+                color: #e2e8f0;
+            }
+        }
+
+        input, select {
+            background-color: white;
+            border: 1px solid #ccc;
+            color: #333;
+            border-radius: 4px;
+            padding: 8px;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            input, select {
+                background-color: #4a5568;
+                border: 1px solid #718096;
+                color: #f7fafc;
+            }
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        button {
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            button:disabled {
+                background-color: #718096;
+            }
+        }
+
+        a {
+            color: #667eea;
+            transition: color 0.3s;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            a {
+                color: #90cdf4;
+            }
+        }
+
+        a:hover {
+            color: #5a67d8;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            a:hover {
+                color: #63b3ed;
+            }
+        }
+
+        #status {
+            border-radius: 4px;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+
+        .description-text {
+            color: #666;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .description-text {
+                color: #a0aec0;
+            }
         }
     </style>
 </head>
@@ -27,7 +165,7 @@
                 >
             </p>
             
-            <p style="font-size: 0.9em; color: #666;" id="apiKeyDescription">
+            <p style="font-size: 0.9em;" class="description-text" id="apiKeyDescription">
                 __apiKeyDescription__
                 <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" id="getApiKeyLink">__getApiKeyLink__</a>
             </p>

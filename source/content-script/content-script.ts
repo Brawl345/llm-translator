@@ -53,7 +53,7 @@ class TranslationModal {
                         </div>
                         <div class="llm-text-section llm-context-section" style="display: none;">
                             <div class="llm-context-header">
-                                <h4>${chrome.i18n.getMessage('additionalContextLabel')}</h4>
+                                <h4 id="context-heading" style="display: none;">${chrome.i18n.getMessage('additionalContextLabel')}</h4>
                                 <button class="llm-context-button" id="get-context-btn">${chrome.i18n.getMessage('additionalContextButton')}</button>
                             </div>
                             <div class="llm-text-content" id="context-text" style="display: none;">
@@ -134,6 +134,13 @@ class TranslationModal {
                 flex-direction: column;
             }
 
+            @media (prefers-color-scheme: dark) {
+                .llm-modal-container {
+                    background: #1a202c;
+                    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+                }
+            }
+
             @keyframes llm-modal-appear {
                 from {
                     opacity: 0;
@@ -155,11 +162,24 @@ class TranslationModal {
                 flex-shrink: 0;
             }
 
+            @media (prefers-color-scheme: dark) {
+                .llm-modal-header {
+                    background: #2d3748;
+                    border-bottom: 1px solid #4a5568;
+                }
+            }
+
             .llm-modal-header h3 {
                 margin: 0;
                 font-size: 18px;
                 font-weight: 600;
                 color: #1a202c;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .llm-modal-header h3 {
+                    color: #f7fafc;
+                }
             }
 
             .llm-modal-close {
@@ -183,6 +203,17 @@ class TranslationModal {
                 color: #2d3748;
             }
 
+            @media (prefers-color-scheme: dark) {
+                .llm-modal-close {
+                    color: #a0aec0;
+                }
+                
+                .llm-modal-close:hover {
+                    background: #4a5568;
+                    color: #f7fafc;
+                }
+            }
+
             .llm-modal-content {
                 padding: 20px;
                 flex: 1;
@@ -198,10 +229,23 @@ class TranslationModal {
                 flex-shrink: 0;
             }
 
+            @media (prefers-color-scheme: dark) {
+                .llm-modal-footer {
+                    background: #2d3748;
+                    border-top: 1px solid #4a5568;
+                }
+            }
+
             .llm-modal-footer small {
                 color: #718096;
                 font-size: 12px;
                 margin: 0;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .llm-modal-footer small {
+                    color: #a0aec0;
+                }
             }
 
             .llm-text-section {
@@ -219,6 +263,12 @@ class TranslationModal {
                 color: #4a5568;
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .llm-text-section h4 {
+                    color: #e2e8f0;
+                }
             }
 
             .llm-original-details {
@@ -247,6 +297,16 @@ class TranslationModal {
                 color: #2d3748;
             }
 
+            @media (prefers-color-scheme: dark) {
+                .llm-original-details summary {
+                    color: #e2e8f0;
+                }
+                
+                .llm-original-details summary:hover {
+                    color: #f7fafc;
+                }
+            }
+
             .llm-original-details summary::-webkit-details-marker {
                 color: #667eea;
             }
@@ -268,12 +328,26 @@ class TranslationModal {
                 min-height: 60px;
             }
 
+            @media (prefers-color-scheme: dark) {
+                .llm-text-content {
+                    background: #2d3748;
+                    border: 1px solid #4a5568;
+                    color: #f7fafc;
+                }
+            }
+
             .llm-loading {
                 display: flex;
                 align-items: center;
                 gap: 12px;
                 color: #718096;
                 font-style: italic;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .llm-loading {
+                    color: #a0aec0;
+                }
             }
 
             .llm-spinner {
@@ -283,6 +357,13 @@ class TranslationModal {
                 border-top: 2px solid #667eea;
                 border-radius: 50%;
                 animation: llm-spin 1s linear infinite;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .llm-spinner {
+                    border: 2px solid #4a5568;
+                    border-top: 2px solid #667eea;
+                }
             }
 
             @keyframes llm-spin {
@@ -308,15 +389,22 @@ class TranslationModal {
                 padding-top: 20px;
             }
 
+            @media (prefers-color-scheme: dark) {
+                .llm-context-section {
+                    border-top: 1px solid #4a5568;
+                }
+            }
+
             .llm-context-header {
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
+                justify-content: flex-end;
                 margin-bottom: 12px;
             }
 
             .llm-context-header h4 {
                 margin: 0;
+                margin-right: auto;
             }
 
             .llm-context-button {
@@ -469,8 +557,9 @@ class TranslationModal {
 
         const contextButton = this.modal?.querySelector('#get-context-btn') as HTMLButtonElement;
         const contextTextEl = this.modal?.querySelector('#context-text') as HTMLElement;
+        const contextHeading = this.modal?.querySelector('#context-heading') as HTMLElement;
 
-        if (!contextButton || !contextTextEl) return;
+        if (!contextButton || !contextTextEl || !contextHeading) return;
 
         // Initialize context streaming
         this.isContextStreaming = true;
@@ -480,7 +569,8 @@ class TranslationModal {
         contextButton.disabled = true;
         contextButton.textContent = chrome.i18n.getMessage('gettingContextStatus');
         
-        // Show the context area with loading
+        // Show the context heading and area with loading
+        contextHeading.style.display = 'block';
         contextTextEl.style.display = 'block';
         contextTextEl.innerHTML = `
             <div class="llm-loading">
@@ -531,14 +621,17 @@ class TranslationModal {
 
         const contextButton = this.modal.querySelector('#get-context-btn') as HTMLButtonElement;
         const contextTextEl = this.modal.querySelector('#context-text') as HTMLElement;
+        const contextHeading = this.modal.querySelector('#context-heading') as HTMLElement;
 
-        if (!contextButton || !contextTextEl) return;
+        if (!contextButton || !contextTextEl || !contextHeading) return;
 
         // Restore button
         contextButton.disabled = false;
         contextButton.textContent = chrome.i18n.getMessage('additionalContextButton');
 
-        // Show context
+        // Show context heading and text
+        contextHeading.style.display = 'block';
+        contextTextEl.style.display = 'block';
         contextTextEl.textContent = payload.contextText;
     }
 
@@ -547,8 +640,9 @@ class TranslationModal {
 
         const contextButton = this.modal.querySelector('#get-context-btn') as HTMLButtonElement;
         const contextTextEl = this.modal.querySelector('#context-text') as HTMLElement;
+        const contextHeading = this.modal.querySelector('#context-heading') as HTMLElement;
 
-        if (!contextButton || !contextTextEl) return;
+        if (!contextButton || !contextTextEl || !contextHeading) return;
 
         // Reset streaming state
         this.isContextStreaming = false;
@@ -558,7 +652,9 @@ class TranslationModal {
         contextButton.disabled = false;
         contextButton.textContent = chrome.i18n.getMessage('additionalContextButton');
 
-        // Show error
+        // Show context heading and error
+        contextHeading.style.display = 'block';
+        contextTextEl.style.display = 'block';
         contextTextEl.innerHTML = `
             <div class="llm-error">
                 ${payload.error.message}
@@ -581,8 +677,10 @@ class TranslationModal {
         const contextSection = this.modal.querySelector('.llm-context-section') as HTMLElement;
         const contextTextEl = this.modal.querySelector('#context-text') as HTMLElement;
         const contextButton = this.modal.querySelector('#get-context-btn') as HTMLButtonElement;
+        const contextHeading = this.modal.querySelector('#context-heading') as HTMLElement;
         
         contextSection.style.display = 'none';
+        contextHeading.style.display = 'none';
         contextTextEl.style.display = 'none';
         contextTextEl.textContent = '';
         contextButton.disabled = false;

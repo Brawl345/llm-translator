@@ -1,6 +1,7 @@
-## v1.0.1
+## v1.1.0
 
-* Add German translation
+* German translation
+* Dark theme
 
 ## v1.0.0
 
