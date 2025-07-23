@@ -16,7 +16,7 @@
     "start:firefox": "web-ext run --no-reload -t firefox-desktop",
     "lint:types": "tsc --project tsconfig.json",
     "lint:code": "biome lint",
-    "lint:web-ext": "npm run build && web-ext lint",
+    "lint:web-ext": "npm run build && web-ext lint --self-hosted",
     "web-ext:build": "npm run build && web-ext build --overwrite-dest"
   },
   "webExt": {
