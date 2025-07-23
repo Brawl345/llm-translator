@@ -43,7 +43,8 @@
     "browser_specific_settings": {
         "gecko": {
             "id": "llm-translator@brawl345.github.com",
-            "strict_min_version": "140.0"
+            "strict_min_version": "140.0",
+            "update_url": "https://raw.githubusercontent.com/Brawl345/llm-translator/master/updates.json"
         }
     }
 }

@@ -1,0 +1,13 @@
+{
+    "addons": {
+        "llm-translator@brawl345.github.com": {
+            "updates": [
+                {
+                    "version": "1.0.0",
+                    "update_link": "https://github.com/brawl345/llm-translator/releases/download/1.0.0/llm_translator-1.0.0.xpi",
+                    "update_info_url": "https://github.com/brawl345/llm-translator/releases/tag/1.0.0"
+                }
+            ]
+        }
+    }
+}
