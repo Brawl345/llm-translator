@@ -8,3 +8,4 @@ web-ext-artifacts/
 *.xpi
 public/_metadata
 public/build
+TODO.md

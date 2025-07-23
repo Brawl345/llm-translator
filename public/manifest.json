@@ -4,7 +4,7 @@
     "name": "__MSG_extensionName__",
     "description": "__MSG_extensionDescription__",
     "author": "Andreas Bielawski",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "update_url": "https://raw.githubusercontent.com/Brawl345/llm-translator/master/updates.xml",
     "icons": {
         "16": "icons/16.png",

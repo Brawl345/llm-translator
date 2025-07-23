@@ -24,7 +24,7 @@
         "message": "No translation received from the API"
     },
     "streamReaderError": {
-        "message": "Failed to get response reader"
+        "message": "Connection error while translating"
     },
     "modalTitle": {
         "message": "LLM Translation"
