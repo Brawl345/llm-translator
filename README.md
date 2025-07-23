@@ -2,10 +2,11 @@
 
 LLM Translator is a WebExtension that provides instant translation of selected text using OpenAI's language models. Simply select text on any webpage, right-click, and get a streaming translation with optional cultural context.
 
-Currently only supports **German**. Completely coded by [Claude Code](https://www.anthropic.com/claude-code).
+Completely coded by [Claude Code](https://www.anthropic.com/claude-code).
 
 ## Features
 
+- **Supports all languages**: Choose a target language or specify one yourself
 - **Context Menu Translation**: Right-click selected text to translate instantly
 - **Streaming Responses**: Real-time translation updates as the AI generates text
 - **Additional Context**: Get cultural explanations for idioms, slang, and cultural references
