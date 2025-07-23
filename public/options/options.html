@@ -44,6 +44,36 @@
             </p>
 
             <p>
+                <label for="targetLanguage" id="targetLanguageLabel">__targetLanguageLabel__</label><br>
+                <select id="targetLanguage" name="targetLanguage">
+                    <option value="German">__germanLanguage__</option>
+                    <option value="English">__englishLanguage__</option>
+                    <option value="French">__frenchLanguage__</option>
+                    <option value="Spanish">__spanishLanguage__</option>
+                    <option value="Italian">__italianLanguage__</option>
+                    <option value="Portuguese">__portugueseLanguage__</option>
+                    <option value="Dutch">__dutchLanguage__</option>
+                    <option value="Russian">__russianLanguage__</option>
+                    <option value="Japanese">__japaneseLanguage__</option>
+                    <option value="Chinese">__chineseLanguage__</option>
+                    <option value="Korean">__koreanLanguage__</option>
+                    <option value="Arabic">__arabicLanguage__</option>
+                    <option value="other">__otherLanguage__</option>
+                </select>
+            </p>
+
+            <p id="customLanguageField" style="display: none;">
+                <label for="customTargetLanguage" id="customTargetLanguageLabel">__customTargetLanguageLabel__</label><br>
+                <input 
+                    type="text" 
+                    id="customTargetLanguage" 
+                    name="customTargetLanguage" 
+                    placeholder="__customTargetLanguagePlaceholder__"
+                    style="width: 300px;"
+                >
+            </p>
+
+            <p>
                 <button type="submit" id="saveBtn">__saveSettingsButton__</button>
             </p>
 

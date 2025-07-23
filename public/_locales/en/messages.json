@@ -86,6 +86,57 @@
     "pleaseSelectModel": {
         "message": "Please select a model"
     },
+    "targetLanguageLabel": {
+        "message": "Target Language:"
+    },
+    "germanLanguage": {
+        "message": "German"
+    },
+    "englishLanguage": {
+        "message": "English"
+    },
+    "frenchLanguage": {
+        "message": "French"
+    },
+    "spanishLanguage": {
+        "message": "Spanish"
+    },
+    "italianLanguage": {
+        "message": "Italian"
+    },
+    "portugueseLanguage": {
+        "message": "Portuguese"
+    },
+    "dutchLanguage": {
+        "message": "Dutch"
+    },
+    "russianLanguage": {
+        "message": "Russian"
+    },
+    "japaneseLanguage": {
+        "message": "Japanese"
+    },
+    "chineseLanguage": {
+        "message": "Chinese"
+    },
+    "koreanLanguage": {
+        "message": "Korean"
+    },
+    "arabicLanguage": {
+        "message": "Arabic"
+    },
+    "otherLanguage": {
+        "message": "Other..."
+    },
+    "customTargetLanguageLabel": {
+        "message": "Custom Language:"
+    },
+    "customTargetLanguagePlaceholder": {
+        "message": "Enter target language (e.g., Latin, Klingon, etc.)"
+    },
+    "pleaseSelectTargetLanguage": {
+        "message": "Please select or specify a target language"
+    },
     "settingsSavedSuccess": {
         "message": "Settings saved successfully!"
     },

@@ -1,6 +1,7 @@
 export interface Settings {
     apiKey: string;
     model: string;
+    targetLanguage: string;
 }
 
 export interface TranslationRequest {
