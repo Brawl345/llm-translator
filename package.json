@@ -17,7 +17,8 @@
     "lint:types": "tsc --project tsconfig.json",
     "lint:code": "biome lint",
     "lint:web-ext": "npm run build && web-ext lint --self-hosted",
-    "release": "tsx scripts/release.ts"
+    "release": "tsx scripts/release.ts",
+    "web-ext:build": "npm run build && web-ext build --overwrite-dest"
   },
   "webExt": {
     "sourceDir": "./public/",

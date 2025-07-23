@@ -25,11 +25,11 @@ Completely coded by [Claude Code](https://www.anthropic.com/claude-code).
 2. Install dependencies with `npm ci`
 3. Run `npm run build` for production bundling
 4. Run `npm run start:firefox` or `npm run start:chrome` for starting the browser with the extension pre-loaded and ready for debugging
-5. Build extension package with `npm run web-ext:build`
+5. Build extension packages with `npm run release` or a ZIP with `npm run web-ext:build`
 
 ## Development
 
-- `npm run build`: Production build (preferred over dev mode)
+- `npm run build`: Production build
 - `npm run lint:types`: TypeScript type checking
 - `npm run lint:code`: Biome code linting
 
