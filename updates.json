@@ -3,9 +3,9 @@
     "llm-translator@brawl345.github.com": {
       "updates": [
         {
-          "version": "1.1.0",
-          "update_link": "https://github.com/Brawl345/llm-translator/releases/download/1.1.0/llm-translator-1.1.0.xpi",
-          "update_info_url": "https://github.com/Brawl345/llm-translator/releases/tag/1.1.0"
+          "version": "1.1.1",
+          "update_link": "https://github.com/Brawl345/llm-translator/releases/download/1.1.1/llm-translator-1.1.1.xpi",
+          "update_info_url": "https://github.com/Brawl345/llm-translator/releases/tag/1.1.1"
         }
       ]
     }

@@ -220,7 +220,8 @@ Translate the following text to ${settings.targetLanguage}:`;
                     content: text,
                 },
             ],
-            temperature: 0.3,
+            ...(settings.model.includes('gpt-5') ? {} : { temperature: 0.3 }),
+            ...(settings.model.includes('gpt-5') && !settings.model.startsWith('gpt-5-chat') ? { reasoning_effort: 'minimal' } : {}),
             stream: true,
         }),
     });
@@ -323,7 +324,8 @@ Explain rarely known words, slang, or cultural context in ${settings.targetLangu
                     content: `Please analyze the context for this translation.`,
                 },
             ],
-            temperature: 0.3,
+            ...(settings.model.includes('gpt-5') ? {} : { temperature: 0.3 }),
+            ...(settings.model.includes('gpt-5') && !settings.model.startsWith('gpt-5-chat') ? { reasoning_effort: 'minimal' } : {}),
             stream: true,
         }),
     });

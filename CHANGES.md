@@ -1,3 +1,6 @@
+## v1.1.1
+* Support GPT-5
+
 ## v1.1.0
 
 * German translation
