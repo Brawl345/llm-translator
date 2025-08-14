@@ -102,6 +102,10 @@ class TranslationModal {
 
         const styles = document.createElement('style');
         styles.textContent = `
+            :host {
+                all: initial;
+            }
+            
             #llm-translator-modal {
                 position: fixed;
                 top: 0;
