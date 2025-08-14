@@ -1,15 +1,8 @@
 #!/usr/bin/env tsx
 
-import { execSync } from 'node:child_process';
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  renameSync,
-  unlinkSync,
-  writeFileSync,
-} from 'node:fs';
-import { join, resolve } from 'node:path';
+import {execSync} from 'node:child_process';
+import {existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync,} from 'node:fs';
+import {join, resolve} from 'node:path';
 
 interface PackageJson {
   name: string;
@@ -153,7 +146,7 @@ function updateFirefoxJson(
           {
             version: version,
             update_link: `${repoUrl}/releases/download/${version}/${packageName}-${version}.xpi`,
-            update_info_url: `${repoUrl}/releases/tag/${version}`,
+              update_info_url: `https://raw.githubusercontent.com/Brawl345/llm-translator/refs/tags/${version}/CHANGES.md`,
           },
         ],
       },
