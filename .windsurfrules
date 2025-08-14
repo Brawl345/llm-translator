@@ -1,1 +1,1 @@
-.llmrules
+AGENTS.md
