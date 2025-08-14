@@ -1,15 +1,16 @@
-import type { 
-    ShowModalMessage, 
-    TranslationStreamMessage, 
-    ContextSuccessMessage,
+import type {
     ContextErrorMessage,
     ContextStreamMessage,
+    ContextSuccessMessage,
     GetAdditionalContextMessage,
-    TranslationError 
+    ShowModalMessage,
+    TranslationError,
+    TranslationStreamMessage
 } from '../shared/types.js';
 
 class TranslationModal {
-    private modal: HTMLElement | null = null;
+    private modalContainer: HTMLElement | null = null;
+    private shadowRoot: ShadowRoot | null = null;
     private isVisible = false;
     private currentTranslation = '';
     private isStreaming = false;
@@ -24,11 +25,16 @@ class TranslationModal {
     }
 
     private createModal(): void {
-        if (this.modal) return;
+        if (this.modalContainer) return;
 
-        this.modal = document.createElement('div');
-        this.modal.id = 'llm-translator-modal';
-        this.modal.innerHTML = `
+        this.modalContainer = document.createElement('div');
+        this.modalContainer.id = 'llm-translator-modal-container';
+
+        this.shadowRoot = this.modalContainer.attachShadow({mode: 'closed'});
+
+        const modal = document.createElement('div');
+        modal.id = 'llm-translator-modal';
+        modal.innerHTML = `
             <div class="llm-modal-overlay">
                 <div class="llm-modal-container">
                     <div class="llm-modal-header">
@@ -68,11 +74,12 @@ class TranslationModal {
         `;
 
         this.injectStyles();
-        document.body.appendChild(this.modal);
+        this.shadowRoot.appendChild(modal);
+        document.body.appendChild(this.modalContainer);
 
-        const closeButton = this.modal.querySelector('.llm-modal-close') as HTMLElement;
-        const overlay = this.modal.querySelector('.llm-modal-overlay') as HTMLElement;
-        const contextButton = this.modal.querySelector('#get-context-btn') as HTMLElement;
+        const closeButton = modal.querySelector('.llm-modal-close') as HTMLElement;
+        const overlay = modal.querySelector('.llm-modal-overlay') as HTMLElement;
+        const contextButton = modal.querySelector('#get-context-btn') as HTMLElement;
 
         closeButton.addEventListener('click', () => this.hide());
         overlay.addEventListener('click', (e) => {
@@ -91,10 +98,9 @@ class TranslationModal {
     }
 
     private injectStyles(): void {
-        if (document.getElementById('llm-translator-styles')) return;
+        if (!this.shadowRoot) return;
 
         const styles = document.createElement('style');
-        styles.id = 'llm-translator-styles';
         styles.textContent = `
             #llm-translator-modal {
                 position: fixed;
@@ -451,7 +457,7 @@ class TranslationModal {
             }
         `;
 
-        document.head.appendChild(styles);
+        this.shadowRoot.appendChild(styles);
     }
 
     private setupMessageListener(): void {
@@ -477,11 +483,12 @@ class TranslationModal {
         error?: TranslationError;
         isStreaming?: boolean;
     }): void {
-        if (!this.modal) return;
+        if (!this.shadowRoot || !this.modalContainer) return;
 
-        const originalTextEl = this.modal.querySelector('#original-text') as HTMLElement;
-        const translatedTextEl = this.modal.querySelector('#translated-text') as HTMLElement;
-        const contextSection = this.modal.querySelector('.llm-context-section') as HTMLElement;
+        const modal = this.shadowRoot.querySelector('#llm-translator-modal') as HTMLElement;
+        const originalTextEl = this.shadowRoot.querySelector('#original-text') as HTMLElement;
+        const translatedTextEl = this.shadowRoot.querySelector('#translated-text') as HTMLElement;
+        const contextSection = this.shadowRoot.querySelector('.llm-context-section') as HTMLElement;
 
         originalTextEl.textContent = payload.originalText;
         this.currentOriginalText = payload.originalText;
@@ -517,11 +524,11 @@ class TranslationModal {
             contextSection.style.display = 'block';
         }
 
-        this.modal.style.display = 'block';
+        modal.style.display = 'block';
         this.isVisible = true;
 
         setTimeout(() => {
-            const container = this.modal?.querySelector('.llm-modal-container') as HTMLElement;
+            const container = this.shadowRoot?.querySelector('.llm-modal-container') as HTMLElement;
             if (container) {
                 container.focus();
             }
@@ -533,9 +540,9 @@ class TranslationModal {
         chunk: string;
         isComplete: boolean;
     }): void {
-        if (!this.modal || !this.isStreaming) return;
+        if (!this.shadowRoot || !this.isStreaming) return;
 
-        const translatedTextEl = this.modal.querySelector('#translated-text') as HTMLElement;
+        const translatedTextEl = this.shadowRoot.querySelector('#translated-text') as HTMLElement;
 
         if (payload.isComplete) {
             this.isStreaming = false;
@@ -543,7 +550,7 @@ class TranslationModal {
             // Final update with complete text
             translatedTextEl.textContent = this.currentTranslation;
             // Show context section when streaming is complete
-            const contextSection = this.modal.querySelector('.llm-context-section') as HTMLElement;
+            const contextSection = this.shadowRoot.querySelector('.llm-context-section') as HTMLElement;
             contextSection.style.display = 'block';
         } else {
             // Append the new chunk
@@ -553,11 +560,11 @@ class TranslationModal {
     }
 
     private requestAdditionalContext(): void {
-        if (!this.hasTranslation || !this.currentOriginalText || !this.currentTranslation) return;
+        if (!this.hasTranslation || !this.currentOriginalText || !this.currentTranslation || !this.shadowRoot) return;
 
-        const contextButton = this.modal?.querySelector('#get-context-btn') as HTMLButtonElement;
-        const contextTextEl = this.modal?.querySelector('#context-text') as HTMLElement;
-        const contextHeading = this.modal?.querySelector('#context-heading') as HTMLElement;
+        const contextButton = this.shadowRoot.querySelector('#get-context-btn') as HTMLButtonElement;
+        const contextTextEl = this.shadowRoot.querySelector('#context-text') as HTMLElement;
+        const contextHeading = this.shadowRoot.querySelector('#context-heading') as HTMLElement;
 
         if (!contextButton || !contextTextEl || !contextHeading) return;
 
@@ -596,10 +603,10 @@ class TranslationModal {
         chunk: string;
         isComplete: boolean;
     }): void {
-        if (!this.modal || !this.isContextStreaming || payload.originalText !== this.currentOriginalText) return;
+        if (!this.shadowRoot || !this.isContextStreaming || payload.originalText !== this.currentOriginalText) return;
 
-        const contextTextEl = this.modal.querySelector('#context-text') as HTMLElement;
-        const contextButton = this.modal.querySelector('#get-context-btn') as HTMLButtonElement;
+        const contextTextEl = this.shadowRoot.querySelector('#context-text') as HTMLElement;
+        const contextButton = this.shadowRoot.querySelector('#get-context-btn') as HTMLButtonElement;
 
         if (!contextTextEl || !contextButton) return;
 
@@ -617,11 +624,11 @@ class TranslationModal {
     }
 
     private handleContextSuccess(payload: { originalText: string; contextText: string }): void {
-        if (!this.modal || payload.originalText !== this.currentOriginalText) return;
+        if (!this.shadowRoot || payload.originalText !== this.currentOriginalText) return;
 
-        const contextButton = this.modal.querySelector('#get-context-btn') as HTMLButtonElement;
-        const contextTextEl = this.modal.querySelector('#context-text') as HTMLElement;
-        const contextHeading = this.modal.querySelector('#context-heading') as HTMLElement;
+        const contextButton = this.shadowRoot.querySelector('#get-context-btn') as HTMLButtonElement;
+        const contextTextEl = this.shadowRoot.querySelector('#context-text') as HTMLElement;
+        const contextHeading = this.shadowRoot.querySelector('#context-heading') as HTMLElement;
 
         if (!contextButton || !contextTextEl || !contextHeading) return;
 
@@ -636,11 +643,11 @@ class TranslationModal {
     }
 
     private handleContextError(payload: { originalText: string; error: TranslationError }): void {
-        if (!this.modal || payload.originalText !== this.currentOriginalText) return;
+        if (!this.shadowRoot || payload.originalText !== this.currentOriginalText) return;
 
-        const contextButton = this.modal.querySelector('#get-context-btn') as HTMLButtonElement;
-        const contextTextEl = this.modal.querySelector('#context-text') as HTMLElement;
-        const contextHeading = this.modal.querySelector('#context-heading') as HTMLElement;
+        const contextButton = this.shadowRoot.querySelector('#get-context-btn') as HTMLButtonElement;
+        const contextTextEl = this.shadowRoot.querySelector('#context-text') as HTMLElement;
+        const contextHeading = this.shadowRoot.querySelector('#context-heading') as HTMLElement;
 
         if (!contextButton || !contextTextEl || !contextHeading) return;
 
@@ -663,9 +670,12 @@ class TranslationModal {
     }
 
     private hide(): void {
-        if (!this.modal) return;
+        if (!this.shadowRoot) return;
 
-        this.modal.style.display = 'none';
+        const modal = this.shadowRoot.querySelector('#llm-translator-modal') as HTMLElement;
+        if (!modal) return;
+
+        modal.style.display = 'none';
         this.isVisible = false;
         this.hasTranslation = false;
         this.currentOriginalText = '';
@@ -674,10 +684,10 @@ class TranslationModal {
         this.currentContext = '';
 
         // Reset context section
-        const contextSection = this.modal.querySelector('.llm-context-section') as HTMLElement;
-        const contextTextEl = this.modal.querySelector('#context-text') as HTMLElement;
-        const contextButton = this.modal.querySelector('#get-context-btn') as HTMLButtonElement;
-        const contextHeading = this.modal.querySelector('#context-heading') as HTMLElement;
+        const contextSection = this.shadowRoot.querySelector('.llm-context-section') as HTMLElement;
+        const contextTextEl = this.shadowRoot.querySelector('#context-text') as HTMLElement;
+        const contextButton = this.shadowRoot.querySelector('#get-context-btn') as HTMLButtonElement;
+        const contextHeading = this.shadowRoot.querySelector('#context-heading') as HTMLElement;
         
         contextSection.style.display = 'none';
         contextHeading.style.display = 'none';
