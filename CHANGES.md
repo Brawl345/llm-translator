@@ -1,3 +1,7 @@
+## v1.1.4
+
+* Tweak system prompt so that all text should get translated, regardless of content (NSFW, etc.)
+
 ## v1.1.3
 
 * Fix page styles bleeding through
