@@ -56,17 +56,56 @@
     "getApiKeyLink": {
         "message": "Get your API key"
     },
-    "fetchModelsButton": {
-        "message": "Fetch Models"
+    "checkApiKeyButton": {
+        "message": "Check API Key"
     },
-    "fetchingModelsButton": {
-        "message": "Fetching Models..."
+    "checkingApiKeyButton": {
+        "message": "Checking API Key..."
+    },
+    "checkingApiKeyStatus": {
+        "message": "Checking API key..."
+    },
+    "apiKeyValidSuccess": {
+        "message": "API key is valid."
+    },
+    "failedToCheckApiKey": {
+        "message": "Failed to check API key: $ERROR_MESSAGE$",
+        "placeholders": {
+            "error_message": {
+                "content": "$1",
+                "example": "Invalid API key"
+            }
+        }
+    },
+    "failedToCheckApiKeyGeneric": {
+        "message": "Failed to check API key. Please check your internet connection and API key."
     },
     "modelLabel": {
         "message": "Model:"
     },
-    "selectModelPlaceholder": {
-        "message": "Select a model..."
+    "reasoningEffortLabel": {
+        "message": "Reasoning effort:"
+    },
+    "reasoningEffortNone": {
+        "message": "None"
+    },
+    "reasoningEffortLow": {
+        "message": "Low"
+    },
+    "reasoningEffortMedium": {
+        "message": "Medium"
+    },
+    "reasoningEffortHigh": {
+        "message": "High"
+    },
+    "migrationNotice": {
+        "message": "The model selection was simplified. Please review your settings. The model has been switched to gpt-5.4 and reasoning effort now defaults to None."
+    },
+    "cardModelTitle": {
+        "message": "Model"
+    },
+    "cardLanguageTitle": {
+        "message": "Language"
     },
     "saveSettingsButton": {
         "message": "Save Settings"
@@ -85,6 +124,9 @@
     },
     "pleaseSelectModel": {
         "message": "Please select a model"
+    },
+    "pleaseSelectReasoningEffort": {
+        "message": "Please select a reasoning effort"
     },
     "targetLanguageLabel": {
         "message": "Target Language:"
@@ -145,33 +187,6 @@
     },
     "pleaseEnterApiKeyFirst": {
         "message": "Please enter an API key first"
-    },
-    "fetchingModelsStatus": {
-        "message": "Fetching available models..."
-    },
-    "noGptModelsFound": {
-        "message": "No GPT models found in your account"
-    },
-    "modelsFoundSuccess": {
-        "message": "Found $COUNT$ GPT models. Please select one.",
-        "placeholders": {
-            "count": {
-                "content": "$1",
-                "example": "5"
-            }
-        }
-    },
-    "failedToFetchModels": {
-        "message": "Failed to fetch models: $ERROR_MESSAGE$",
-        "placeholders": {
-            "error_message": {
-                "content": "$1",
-                "example": "Invalid API key"
-            }
-        }
-    },
-    "failedToFetchModelsGeneric": {
-        "message": "Failed to fetch models. Please check your internet connection and API key."
     },
     "additionalContextButton": {
         "message": "Additional Context"

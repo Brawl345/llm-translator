@@ -1,3 +1,8 @@
+## v1.2.0
+
+* Simplify model selector
+* Reasoning can be configured
+
 ## v1.1.4
 
 * Tweak system prompt so that all text should get translated, regardless of content (NSFW, etc.)

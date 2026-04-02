@@ -56,17 +56,56 @@
     "getApiKeyLink": {
         "message": "Hol dir deinen API-Schlüssel"
     },
-    "fetchModelsButton": {
-        "message": "Modelle abrufen"
+    "checkApiKeyButton": {
+        "message": "API-Schlüssel prüfen"
     },
-    "fetchingModelsButton": {
-        "message": "Modelle werden abgerufen..."
+    "checkingApiKeyButton": {
+        "message": "API-Schlüssel wird geprüft..."
+    },
+    "checkingApiKeyStatus": {
+        "message": "API-Schlüssel wird geprüft..."
+    },
+    "apiKeyValidSuccess": {
+        "message": "API-Schlüssel ist gültig."
+    },
+    "failedToCheckApiKey": {
+        "message": "Fehler beim Prüfen des API-Schlüssels: $ERROR_MESSAGE$",
+        "placeholders": {
+            "error_message": {
+                "content": "$1",
+                "example": "Ungültiger API-Schlüssel"
+            }
+        }
+    },
+    "failedToCheckApiKeyGeneric": {
+        "message": "Fehler beim Prüfen des API-Schlüssels. Bitte überprüfe deine Internetverbindung und deinen API-Schlüssel."
     },
     "modelLabel": {
         "message": "Modell:"
     },
-    "selectModelPlaceholder": {
-        "message": "Wähle ein Modell..."
+    "reasoningEffortLabel": {
+        "message": "Reasoning-Aufwand:"
+    },
+    "reasoningEffortNone": {
+        "message": "Keiner"
+    },
+    "reasoningEffortLow": {
+        "message": "Niedrig"
+    },
+    "reasoningEffortMedium": {
+        "message": "Mittel"
+    },
+    "reasoningEffortHigh": {
+        "message": "Hoch"
+    },
+    "migrationNotice": {
+        "message": "Die Modellauswahl wurde vereinfacht. Bitte überprüfe deine Einstellungen. Das Modell wurde auf gpt-5.4 umgestellt und der Reasoning-Aufwand steht jetzt standardmäßig auf Keiner."
+    },
+    "cardModelTitle": {
+        "message": "Modell"
+    },
+    "cardLanguageTitle": {
+        "message": "Sprache"
     },
     "saveSettingsButton": {
         "message": "Einstellungen speichern"
@@ -85,6 +124,9 @@
     },
     "pleaseSelectModel": {
         "message": "Bitte wähle ein Modell aus"
+    },
+    "pleaseSelectReasoningEffort": {
+        "message": "Bitte wähle einen Reasoning-Aufwand aus"
     },
     "targetLanguageLabel": {
         "message": "Zielsprache:"
@@ -145,33 +187,6 @@
     },
     "pleaseEnterApiKeyFirst": {
         "message": "Bitte gib zuerst einen API-Schlüssel ein"
-    },
-    "fetchingModelsStatus": {
-        "message": "Verfügbare Modelle werden abgerufen..."
-    },
-    "noGptModelsFound": {
-        "message": "Keine GPT-Modelle in deinem Account gefunden"
-    },
-    "modelsFoundSuccess": {
-        "message": "$COUNT$ GPT-Modelle gefunden. Bitte wähle eines aus.",
-        "placeholders": {
-            "count": {
-                "content": "$1",
-                "example": "5"
-            }
-        }
-    },
-    "failedToFetchModels": {
-        "message": "Fehler beim Abrufen der Modelle: $ERROR_MESSAGE$",
-        "placeholders": {
-            "error_message": {
-                "content": "$1",
-                "example": "Ungültiger API-Schlüssel"
-            }
-        }
-    },
-    "failedToFetchModelsGeneric": {
-        "message": "Fehler beim Abrufen der Modelle. Bitte überprüfe deine Internetverbindung und deinen API-Schlüssel."
     },
     "additionalContextButton": {
         "message": "Zusätzlicher Kontext"

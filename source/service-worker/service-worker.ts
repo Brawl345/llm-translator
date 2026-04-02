@@ -1,35 +1,47 @@
-import type { 
-    Settings, 
-    TranslationError,
-    ShowModalMessage,
-    TranslationStreamMessage,
-    GetAdditionalContextMessage,
+import type {
     ContextErrorMessage,
-    ContextStreamMessage
+    ContextStreamMessage,
+    GetAdditionalContextMessage,
+    ReasoningEffort,
+    Settings,
+    ShowModalMessage,
+    SupportedModel,
+    TranslationError,
+    TranslationStreamMessage,
 } from '../shared/types.js';
 
 const CONTEXT_MENU_ID = 'translate-text';
+const DEFAULT_MODEL: SupportedModel = 'gpt-5.4';
+const DEFAULT_REASONING_EFFORT: ReasoningEffort = 'none';
+const SUPPORTED_MODELS: SupportedModel[] = ['gpt-5.4', 'gpt-5.4-mini', 'gpt-5.4-nano'];
+const REASONING_EFFORTS: ReasoningEffort[] = ['none', 'low', 'medium', 'high'];
+const CONTEXT_LIMIT_TOKENS = 1047576;
+const CHARS_PER_TOKEN = 4;
 
-chrome.runtime.onInstalled.addListener(async () => {
+chrome.runtime.onInstalled.addListener(async (details) => {
     chrome.contextMenus.create({
         id: CONTEXT_MENU_ID,
         title: chrome.i18n.getMessage('contextMenuTitle'),
         contexts: ['selection'],
     });
 
-    // Check if API key is set, if not open options page
+    if (details.reason === 'update') {
+        await migrateSettings();
+        await chrome.storage.local.set({ showMigrationNotice: true });
+        await chrome.runtime.openOptionsPage();
+        return;
+    }
+
     const settings = await getSettings();
     if (!settings.apiKey) {
-        chrome.runtime.openOptionsPage();
+        await chrome.runtime.openOptionsPage();
     }
 });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     if (info.menuItemId === CONTEXT_MENU_ID && info.selectionText && tab?.id) {
         const selectedText = info.selectionText.trim();
-        
         if (!selectedText) return;
-
         await handleTranslation(selectedText, tab.id);
     }
 });
@@ -43,14 +55,13 @@ chrome.action.onClicked.addListener(async (tab) => {
             func: () => {
                 const selection = window.getSelection();
                 return selection ? selection.toString().trim() : '';
-            }
+            },
         });
 
         const selectedText = results[0]?.result;
-        
         if (!selectedText) {
             await showTranslationModal(tab.id, '', false, undefined, {
-                message: chrome.i18n.getMessage('noTextSelectedError')
+                message: chrome.i18n.getMessage('noTextSelectedError'),
             });
             return;
         }
@@ -64,9 +75,55 @@ chrome.action.onClicked.addListener(async (tab) => {
     }
 });
 
+chrome.runtime.onMessage.addListener(async (message, sender, _sendResponse) => {
+    if (message.type === 'GET_ADDITIONAL_CONTEXT' && sender.tab?.id) {
+        const contextMessage = message as GetAdditionalContextMessage;
+        try {
+            await getAdditionalContextStream(
+                contextMessage.payload.originalText,
+                contextMessage.payload.translatedText,
+                sender.tab.id,
+            );
+        } catch (error) {
+            const errorMessage: ContextErrorMessage = {
+                type: 'CONTEXT_ERROR',
+                payload: {
+                    originalText: contextMessage.payload.originalText,
+                    error: {
+                        message: error instanceof Error ? error.message : 'Failed to get additional context',
+                    },
+                },
+            };
+
+            await chrome.tabs.sendMessage(sender.tab.id, errorMessage);
+        }
+    }
+});
+
+async function migrateSettings(): Promise<void> {
+    const result = await chrome.storage.sync.get(['model', 'reasoningEffort', 'availableModels']);
+    const updates: Record<string, unknown> = {};
+
+    if (!isSupportedModel(result.model) || result.model !== DEFAULT_MODEL) {
+        updates.model = DEFAULT_MODEL;
+    }
+
+    if (!isReasoningEffort(result.reasoningEffort)) {
+        updates.reasoningEffort = DEFAULT_REASONING_EFFORT;
+    }
+
+    if (Object.keys(updates).length > 0) {
+        await chrome.storage.sync.set(updates);
+    }
+
+    if (Object.hasOwn(result, 'availableModels')) {
+        await chrome.storage.sync.remove('availableModels');
+    }
+}
+
 async function handleTranslation(selectedText: string, tabId: number): Promise<void> {
     await showTranslationModal(tabId, selectedText, false, undefined, undefined, true);
-    
+
     try {
         await translateTextStream(selectedText, tabId);
     } catch (error) {
@@ -77,38 +134,13 @@ async function handleTranslation(selectedText: string, tabId: number): Promise<v
     }
 }
 
-chrome.runtime.onMessage.addListener(async (message, sender, _sendResponse) => {
-    if (message.type === 'GET_ADDITIONAL_CONTEXT' && sender.tab?.id) {
-        const contextMessage = message as GetAdditionalContextMessage;
-        try {
-            await getAdditionalContextStream(
-                contextMessage.payload.originalText,
-                contextMessage.payload.translatedText,
-                sender.tab.id
-            );
-        } catch (error) {
-            const errorMessage: ContextErrorMessage = {
-                type: 'CONTEXT_ERROR',
-                payload: {
-                    originalText: contextMessage.payload.originalText,
-                    error: {
-                        message: error instanceof Error ? error.message : 'Failed to get additional context'
-                    }
-                }
-            };
-            
-            await chrome.tabs.sendMessage(sender.tab.id, errorMessage);
-        }
-    }
-});
-
 async function showTranslationModal(
-    tabId: number, 
-    originalText: string, 
-    loading: boolean = false, 
+    tabId: number,
+    originalText: string,
+    loading = false,
     translatedText?: string,
     error?: TranslationError,
-    isStreaming?: boolean
+    isStreaming?: boolean,
 ): Promise<void> {
     const message: ShowModalMessage = {
         type: 'SHOW_MODAL',
@@ -128,7 +160,7 @@ async function sendStreamChunk(
     tabId: number,
     originalText: string,
     chunk: string,
-    isComplete: boolean
+    isComplete: boolean,
 ): Promise<void> {
     const message: TranslationStreamMessage = {
         type: 'TRANSLATION_STREAM',
@@ -146,7 +178,7 @@ async function sendContextStreamChunk(
     tabId: number,
     originalText: string,
     chunk: string,
-    isComplete: boolean
+    isComplete: boolean,
 ): Promise<void> {
     const message: ContextStreamMessage = {
         type: 'CONTEXT_STREAM',
@@ -160,29 +192,24 @@ async function sendContextStreamChunk(
     await chrome.tabs.sendMessage(tabId, message);
 }
 
-function validateInputLength(text: string, systemPrompt: string, modelName: string): void {
-    const CHARS_PER_TOKEN = 4;
-    const GPT4_CONTEXT_LIMIT = 128000; // tokens
-    const OTHER_MODELS_CONTEXT_LIMIT = 1047576; // tokens
-    
-    const isGpt4Model = modelName.includes('gpt-4o') || modelName.startsWith('gpt-4-');
-    const tokenLimit = isGpt4Model ? GPT4_CONTEXT_LIMIT : OTHER_MODELS_CONTEXT_LIMIT;
-    const charLimit = tokenLimit * CHARS_PER_TOKEN;
-    
+function validateInputLength(text: string, systemPrompt: string): void {
+    const charLimit = CONTEXT_LIMIT_TOKENS * CHARS_PER_TOKEN;
     const totalChars = systemPrompt.length + text.length;
-    
+
     if (totalChars > charLimit) {
         const maxUserChars = charLimit - systemPrompt.length;
-        throw new Error(chrome.i18n.getMessage('textTooLongError', [
-            totalChars.toLocaleString(),
-            maxUserChars.toLocaleString()
-        ]));
+        throw new Error(
+            chrome.i18n.getMessage('textTooLongError', [
+                totalChars.toLocaleString(),
+                maxUserChars.toLocaleString(),
+            ]),
+        );
     }
 }
 
 async function translateTextStream(text: string, tabId: number): Promise<void> {
     const settings = await getSettings();
-    
+
     if (!settings.apiKey) {
         throw new Error(chrome.i18n.getMessage('noApiKeyError'));
     }
@@ -200,13 +227,12 @@ Rules:
 
 Translate the following text to ${settings.targetLanguage}:`;
 
-    // Validate input length
-    validateInputLength(text, systemPrompt, settings.model);
+    validateInputLength(text, systemPrompt);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
-            'Authorization': `Bearer ${settings.apiKey}`,
+            Authorization: `Bearer ${settings.apiKey}`,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -221,8 +247,7 @@ Translate the following text to ${settings.targetLanguage}:`;
                     content: text,
                 },
             ],
-            ...(!settings.model.includes('gpt-5') || settings.model.startsWith('gpt-5-chat') ? { temperature: 0.3 } : {}),
-            ...(settings.model.includes('gpt-5') && !settings.model.startsWith('gpt-5-chat') ? { reasoning_effort: 'minimal' } : {}),
+            reasoning_effort: settings.reasoningEffort,
             stream: true,
         }),
     });
@@ -244,7 +269,7 @@ Translate the following text to ${settings.targetLanguage}:`;
     try {
         while (true) {
             const { done, value } = await reader.read();
-            
+
             if (done) {
                 await sendStreamChunk(tabId, text, '', true);
                 break;
@@ -255,24 +280,23 @@ Translate the following text to ${settings.targetLanguage}:`;
             buffer = lines.pop() || '';
 
             for (const line of lines) {
-                if (line.startsWith('data: ')) {
-                    const data = line.slice(6).trim();
-                    
-                    if (data === '[DONE]') {
-                        await sendStreamChunk(tabId, text, '', true);
-                        return;
-                    }
+                if (!line.startsWith('data: ')) {
+                    continue;
+                }
 
-                    try {
-                        const parsed = JSON.parse(data);
-                        const chunk = parsed.choices?.[0]?.delta?.content || '';
-                        
-                        if (chunk) {
-                            await sendStreamChunk(tabId, text, chunk, false);
-                        }
-                    } catch (_error) {
-                        // Skip invalid JSON chunks
+                const data = line.slice(6).trim();
+                if (data === '[DONE]') {
+                    await sendStreamChunk(tabId, text, '', true);
+                    return;
+                }
+
+                try {
+                    const parsed = JSON.parse(data);
+                    const chunk = parsed.choices?.[0]?.delta?.content || '';
+                    if (chunk) {
+                        await sendStreamChunk(tabId, text, chunk, false);
                     }
+                } catch (_error) {
                 }
             }
         }
@@ -283,7 +307,7 @@ Translate the following text to ${settings.targetLanguage}:`;
 
 async function getAdditionalContextStream(originalText: string, translatedText: string, tabId: number): Promise<void> {
     const settings = await getSettings();
-    
+
     if (!settings.apiKey) {
         throw new Error(chrome.i18n.getMessage('noApiKeyError'));
     }
@@ -304,14 +328,12 @@ ${settings.targetLanguage} translation: "${translatedText}"
 
 Explain rarely known words, slang, or cultural context in ${settings.targetLanguage}:`;
 
-    // Validate input length (original + translated text combined)
-    const combinedText = `${originalText}\n${translatedText}`;
-    validateInputLength(combinedText, systemPrompt, settings.model);
+    validateInputLength(`${originalText}\n${translatedText}`, systemPrompt);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
-            'Authorization': `Bearer ${settings.apiKey}`,
+            Authorization: `Bearer ${settings.apiKey}`,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -323,11 +345,10 @@ Explain rarely known words, slang, or cultural context in ${settings.targetLangu
                 },
                 {
                     role: 'user',
-                    content: `Please analyze the context for this translation.`,
+                    content: 'Please analyze the context for this translation.',
                 },
             ],
-            ...(!settings.model.includes('gpt-5') || settings.model.startsWith('gpt-5-chat') ? { temperature: 0.3 } : {}),
-            ...(settings.model.includes('gpt-5') && !settings.model.startsWith('gpt-5-chat') ? { reasoning_effort: 'minimal' } : {}),
+            reasoning_effort: settings.reasoningEffort,
             stream: true,
         }),
     });
@@ -340,7 +361,7 @@ Explain rarely known words, slang, or cultural context in ${settings.targetLangu
 
     const reader = response.body?.getReader();
     if (!reader) {
-        throw new Error('Failed to get context stream reader');
+        throw new Error(chrome.i18n.getMessage('streamReaderError'));
     }
 
     const decoder = new TextDecoder();
@@ -349,7 +370,7 @@ Explain rarely known words, slang, or cultural context in ${settings.targetLangu
     try {
         while (true) {
             const { done, value } = await reader.read();
-            
+
             if (done) {
                 await sendContextStreamChunk(tabId, originalText, '', true);
                 break;
@@ -360,24 +381,23 @@ Explain rarely known words, slang, or cultural context in ${settings.targetLangu
             buffer = lines.pop() || '';
 
             for (const line of lines) {
-                if (line.startsWith('data: ')) {
-                    const data = line.slice(6).trim();
-                    
-                    if (data === '[DONE]') {
-                        await sendContextStreamChunk(tabId, originalText, '', true);
-                        return;
-                    }
+                if (!line.startsWith('data: ')) {
+                    continue;
+                }
 
-                    try {
-                        const parsed = JSON.parse(data);
-                        const chunk = parsed.choices?.[0]?.delta?.content || '';
-                        
-                        if (chunk) {
-                            await sendContextStreamChunk(tabId, originalText, chunk, false);
-                        }
-                    } catch (_error) {
-                        // Skip invalid JSON chunks
+                const data = line.slice(6).trim();
+                if (data === '[DONE]') {
+                    await sendContextStreamChunk(tabId, originalText, '', true);
+                    return;
+                }
+
+                try {
+                    const parsed = JSON.parse(data);
+                    const chunk = parsed.choices?.[0]?.delta?.content || '';
+                    if (chunk) {
+                        await sendContextStreamChunk(tabId, originalText, chunk, false);
                     }
+                } catch (_error) {
                 }
             }
         }
@@ -387,10 +407,19 @@ Explain rarely known words, slang, or cultural context in ${settings.targetLangu
 }
 
 async function getSettings(): Promise<Settings> {
-    const result = await chrome.storage.sync.get(['apiKey', 'model', 'targetLanguage']);
+    const result = await chrome.storage.sync.get(['apiKey', 'model', 'reasoningEffort', 'targetLanguage']);
     return {
         apiKey: result.apiKey || '',
-        model: result.model || 'gpt-4.1',
+        model: isSupportedModel(result.model) ? result.model : DEFAULT_MODEL,
+        reasoningEffort: isReasoningEffort(result.reasoningEffort) ? result.reasoningEffort : DEFAULT_REASONING_EFFORT,
         targetLanguage: result.targetLanguage || 'German',
     };
+}
+
+function isSupportedModel(value: unknown): value is SupportedModel {
+    return typeof value === 'string' && SUPPORTED_MODELS.includes(value as SupportedModel);
+}
+
+function isReasoningEffort(value: unknown): value is ReasoningEffort {
+    return typeof value === 'string' && REASONING_EFFORTS.includes(value as ReasoningEffort);
 }

@@ -1,6 +1,11 @@
+export type SupportedModel = 'gpt-5.4' | 'gpt-5.4-mini' | 'gpt-5.4-nano';
+
+export type ReasoningEffort = 'none' | 'low' | 'medium' | 'high';
+
 export interface Settings {
     apiKey: string;
-    model: string;
+    model: SupportedModel;
+    reasoningEffort: ReasoningEffort;
     targetLanguage: string;
 }
 

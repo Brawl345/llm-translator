@@ -2,187 +2,356 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title id="pageTitle">__settingsTitle__</title>
+    <title>LLM Translator</title>
     <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg:          #f5f5f7;
+            --card-bg:     #ffffff;
+            --border:      #e2e2e7;
+            --text:        #1d1d1f;
+            --text-muted:  #6e6e73;
+            --accent:      #0071e3;
+            --accent-h:    #0077ed;
+            --input-bg:    #ffffff;
+            --input-border:#c7c7cc;
+            --notice-bg:   #fff8db;
+            --notice-border:#ffe08a;
+            --notice-text: #744210;
+            --success-bg:  #d4edda;
+            --success-border:#c3e6cb;
+            --success-text:#155724;
+            --error-bg:    #f8d7da;
+            --error-border:#f5c6cb;
+            --error-text:  #721c24;
+            --info-bg:     #e8f4fd;
+            --info-border: #bee5eb;
+            --info-text:   #0c5460;
+            --btn-secondary-bg: #f2f2f7;
+            --btn-secondary-text: #1d1d1f;
+            --btn-secondary-border: #c7c7cc;
+            --radius-sm:   6px;
+            --radius-md:   10px;
+            --radius-lg:   14px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg:          #1c1c1e;
+                --card-bg:     #2c2c2e;
+                --border:      #3a3a3c;
+                --text:        #f5f5f7;
+                --text-muted:  #98989d;
+                --accent:      #0a84ff;
+                --accent-h:    #409cff;
+                --input-bg:    #1c1c1e;
+                --input-border:#48484a;
+                --notice-bg:   #3d2e00;
+                --notice-border:#b7791f;
+                --notice-text: #fefcbf;
+                --success-bg:  #1a3a26;
+                --success-border:#2d6a4f;
+                --success-text:#95d5b2;
+                --error-bg:    #3a1a1e;
+                --error-border:#6b2737;
+                --error-text:  #f4a0a8;
+                --info-bg:     #0d2d3e;
+                --info-border: #1e5f74;
+                --info-text:   #90cdf4;
+                --btn-secondary-bg:   #3a3a3c;
+                --btn-secondary-text: #f5f5f7;
+                --btn-secondary-border: #48484a;
+            }
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background-color: white;
-            color: #333;
-            transition: background-color 0.3s, color 0.3s;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+            font-size: 14px;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 24px;
+            min-width: 400px;
+            max-width: 520px;
         }
 
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #1a202c;
-                color: #f7fafc;
-            }
-        }
-
-        fieldset {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            background-color: #f9f9f9;
-            transition: border-color 0.3s, background-color 0.3s;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            fieldset {
-                border: 1px solid #4a5568;
-                background-color: #2d3748;
-            }
-        }
-
-        legend {
-            color: #333;
+        h1 {
+            font-size: 18px;
             font-weight: 600;
-            padding: 0 10px;
-            transition: color 0.3s;
+            margin: 0 0 20px 0;
+            color: var(--text);
+            letter-spacing: -0.2px;
         }
 
-        @media (prefers-color-scheme: dark) {
-            legend {
-                color: #f7fafc;
-            }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+            margin: 0 0 14px 0;
+        }
+
+        .field {
+            margin-bottom: 14px;
+        }
+
+        .field:last-child {
+            margin-bottom: 0;
         }
 
         label {
-            color: #555;
+            display: block;
+            font-size: 13px;
             font-weight: 500;
-            transition: color 0.3s;
+            color: var(--text);
+            margin-bottom: 5px;
         }
 
-        @media (prefers-color-scheme: dark) {
-            label {
-                color: #e2e8f0;
-            }
+        .field-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        .field-hint a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .field-hint a:hover {
+            text-decoration: underline;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .input-row input {
+            flex: 1;
         }
 
         input, select {
-            background-color: white;
-            border: 1px solid #ccc;
-            color: #333;
-            border-radius: 4px;
-            padding: 8px;
-            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text);
+            border-radius: var(--radius-sm);
+            padding: 7px 10px;
+            font-size: 13px;
+            font-family: inherit;
+            appearance: none;
+            -webkit-appearance: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
         }
 
-        @media (prefers-color-scheme: dark) {
-            input, select {
-                background-color: #4a5568;
-                border: 1px solid #718096;
-                color: #f7fafc;
-            }
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236e6e73' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
         }
 
         input:focus, select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
         }
 
-        button {
-            background-color: #667eea;
-            color: white;
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
             border: none;
-            border-radius: 4px;
-            padding: 10px 16px;
-            cursor: pointer;
-            font-size: 14px;
+            border-radius: var(--radius-sm);
+            padding: 7px 14px;
+            font-size: 13px;
             font-weight: 500;
-            transition: background-color 0.3s, transform 0.1s;
+            font-family: inherit;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: opacity 0.15s, background-color 0.15s;
         }
 
-        button:hover:not(:disabled) {
-            background-color: #5a67d8;
-            transform: translateY(-1px);
-        }
-
-        button:disabled {
-            background-color: #a0aec0;
+        .btn:disabled {
+            opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--accent-h);
+        }
+
+        .btn-secondary {
+            background: var(--btn-secondary-bg);
+            color: var(--btn-secondary-text);
+            border: 1px solid var(--btn-secondary-border);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            opacity: 0.8;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 4px;
+        }
+
+        .notice {
+            display: none;
+            padding: 12px 14px;
+            border: 1px solid var(--notice-border);
+            border-radius: var(--radius-md);
+            background: var(--notice-bg);
+            color: var(--notice-text);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .notice::before {
+            content: '⚠️ ';
+        }
+
+        .input--error {
+            border-color: #e53e3e !important;
+            box-shadow: 0 0 0 3px color-mix(in srgb, #e53e3e 20%, transparent) !important;
+        }
+
+        .field-error-msg {
+            display: block;
+            margin-top: 4px;
+            font-size: 12px;
+            color: #e53e3e;
         }
 
         @media (prefers-color-scheme: dark) {
-            button:disabled {
-                background-color: #718096;
-            }
-        }
-
-        a {
-            color: #667eea;
-            transition: color 0.3s;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            a {
-                color: #90cdf4;
-            }
-        }
-
-        a:hover {
-            color: #5a67d8;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            a:hover {
-                color: #63b3ed;
+            .field-error-msg {
+                color: #fc8181;
             }
         }
 
         #status {
-            border-radius: 4px;
-            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1.4;
+            white-space: nowrap;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+            z-index: 9999;
+            animation: toast-in 0.2s ease;
         }
 
-        .description-text {
-            color: #666;
+        @keyframes toast-in {
+            from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
-        @media (prefers-color-scheme: dark) {
-            .description-text {
-                color: #a0aec0;
-            }
+        #status.success {
+            background: var(--success-bg);
+            color: var(--success-text);
+            border: 1px solid var(--success-border);
+        }
+
+        #status.error {
+            background: var(--error-bg);
+            color: var(--error-text);
+            border: 1px solid var(--error-border);
+        }
+
+        #status.info {
+            background: var(--info-bg);
+            color: var(--info-text);
+            border: 1px solid var(--info-border);
         }
     </style>
 </head>
 <body>
+    <h1 id="pageTitle">__settingsTitle__</h1>
+
+    <div id="migrationNotice" class="notice">
+        <span id="migrationNoticeText">__migrationNotice__</span>
+    </div>
+
     <form id="settingsForm">
-        <fieldset>
-            <legend id="settingsLegend">__settingsTitle__</legend>
-            
-            <p>
-                <label for="apiKey" id="apiKeyLabel">__apiKeyLabel__</label><br>
-                <input 
-                    type="password" 
-                    id="apiKey" 
-                    name="apiKey" 
-                    placeholder="__apiKeyPlaceholder__" 
-                    autocomplete="off"
-                    spellcheck="false"
-                    style="width: 300px;"
-                >
-            </p>
-            
-            <p style="font-size: 0.9em;" class="description-text" id="apiKeyDescription">
-                __apiKeyDescription__
-                <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" id="getApiKeyLink">__getApiKeyLink__</a>
-            </p>
 
-            <p>
-                <button type="button" id="fetchModelsBtn">__fetchModelsButton__</button>
-            </p>
+        <div class="card">
+            <p class="card-title" id="cardApiKeyTitle">API</p>
 
-            <p>
-                <label for="model" id="modelLabel">__modelLabel__</label><br>
+            <div class="field">
+                <label for="apiKey" id="apiKeyLabel">__apiKeyLabel__</label>
+                <div class="input-row">
+                    <input
+                        type="password"
+                        id="apiKey"
+                        name="apiKey"
+                        placeholder="__apiKeyPlaceholder__"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+                    <button type="button" id="checkApiKeyBtn" class="btn btn-secondary">__checkApiKeyButton__</button>
+                </div>
+                <p class="field-hint" id="apiKeyDescription">
+                    __apiKeyDescription__
+                    <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" id="getApiKeyLink">__getApiKeyLink__</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <p class="card-title" id="cardModelTitle">__cardModelTitle__</p>
+
+            <div class="field">
+                <label for="model" id="modelLabel">__modelLabel__</label>
                 <select id="model" name="model">
-                    <option value="" id="selectModelOption">__selectModelPlaceholder__</option>
+                    <option value="gpt-5.4">gpt-5.4</option>
+                    <option value="gpt-5.4-mini">gpt-5.4-mini</option>
+                    <option value="gpt-5.4-nano">gpt-5.4-nano</option>
                 </select>
-            </p>
+            </div>
 
-            <p>
-                <label for="targetLanguage" id="targetLanguageLabel">__targetLanguageLabel__</label><br>
+            <div class="field">
+                <label for="reasoningEffort" id="reasoningEffortLabel">__reasoningEffortLabel__</label>
+                <select id="reasoningEffort" name="reasoningEffort">
+                    <option value="none">__reasoningEffortNone__</option>
+                    <option value="low">__reasoningEffortLow__</option>
+                    <option value="medium">__reasoningEffortMedium__</option>
+                    <option value="high">__reasoningEffortHigh__</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="card">
+            <p class="card-title" id="cardLanguageTitle">__cardLanguageTitle__</p>
+
+            <div class="field">
+                <label for="targetLanguage" id="targetLanguageLabel">__targetLanguageLabel__</label>
                 <select id="targetLanguage" name="targetLanguage">
                     <option value="German">__germanLanguage__</option>
                     <option value="English">__englishLanguage__</option>
@@ -198,27 +367,26 @@
                     <option value="Arabic">__arabicLanguage__</option>
                     <option value="other">__otherLanguage__</option>
                 </select>
-            </p>
+            </div>
 
-            <p id="customLanguageField" style="display: none;">
-                <label for="customTargetLanguage" id="customTargetLanguageLabel">__customTargetLanguageLabel__</label><br>
-                <input 
-                    type="text" 
-                    id="customTargetLanguage" 
-                    name="customTargetLanguage" 
+            <div class="field" id="customLanguageField" style="display: none;">
+                <label for="customTargetLanguage" id="customTargetLanguageLabel">__customTargetLanguageLabel__</label>
+                <input
+                    type="text"
+                    id="customTargetLanguage"
+                    name="customTargetLanguage"
                     placeholder="__customTargetLanguagePlaceholder__"
-                    style="width: 300px;"
                 >
-            </p>
+            </div>
+        </div>
 
-            <p>
-                <button type="submit" id="saveBtn">__saveSettingsButton__</button>
-            </p>
+        <div class="actions">
+            <button type="submit" id="saveBtn" class="btn btn-primary">__saveSettingsButton__</button>
+        </div>
 
-            <div id="status" style="display: none; margin-top: 10px; padding: 5px; border-radius: 3px;"></div>
-        </fieldset>
     </form>
 
     <script type="module" src="../build/options/options.js"></script>
+    <div id="status"></div>
 </body>
 </html>
