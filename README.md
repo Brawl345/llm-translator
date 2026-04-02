@@ -10,7 +10,7 @@ Completely coded by [Claude Code](https://www.anthropic.com/claude-code).
 - **Context Menu Translation**: Right-click selected text to translate instantly
 - **Streaming Responses**: Real-time translation updates as the AI generates text
 - **Additional Context**: Get cultural explanations for idioms, slang, and cultural references
-- **Model Flexibility**: Support for various OpenAI models (GPT-4, GPT-4o, etc.)
+- **Model Flexibility**: Support for current normal, mini and nano OpenAI models
 
 ## Setup
 
