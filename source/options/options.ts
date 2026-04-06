@@ -134,7 +134,7 @@ class OptionsPage {
                 chrome.storage.local.get(['showMigrationNotice']),
             ]);
 
-            if (syncResult.apiKey) {
+            if (typeof syncResult.apiKey === 'string') {
                 this.apiKeyInput.value = syncResult.apiKey;
             }
 
@@ -143,7 +143,7 @@ class OptionsPage {
                 ? syncResult.reasoningEffort
                 : DEFAULT_REASONING_EFFORT;
 
-            const targetLanguage = syncResult.targetLanguage || 'German';
+            const targetLanguage = typeof syncResult.targetLanguage === 'string' ? syncResult.targetLanguage : 'German';
             const predefinedLanguages = ['German', 'English', 'French', 'Spanish', 'Italian', 'Portuguese', 'Dutch', 'Russian', 'Japanese', 'Chinese', 'Korean', 'Arabic'];
 
             if (predefinedLanguages.includes(targetLanguage)) {

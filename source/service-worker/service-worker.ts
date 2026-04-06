@@ -414,10 +414,10 @@ Explain rarely known words, slang, or cultural context in ${settings.targetLangu
 async function getSettings(): Promise<Settings> {
     const result = await chrome.storage.sync.get(['apiKey', 'model', 'reasoningEffort', 'targetLanguage']);
     return {
-        apiKey: result.apiKey || '',
+        apiKey: typeof result.apiKey === 'string' ? result.apiKey : '',
         model: isSupportedModel(result.model) ? result.model : DEFAULT_MODEL,
         reasoningEffort: isReasoningEffort(result.reasoningEffort) ? result.reasoningEffort : DEFAULT_REASONING_EFFORT,
-        targetLanguage: result.targetLanguage || 'German',
+        targetLanguage: typeof result.targetLanguage === 'string' ? result.targetLanguage : 'German',
     };
 }
 
