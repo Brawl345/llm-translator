@@ -227,5 +227,17 @@
     },
     "noTextSelectedError": {
         "message": "Bitte wähle Text zum Übersetzen aus."
+    },
+    "copyButtonLabel": {
+        "message": "Übersetzung kopieren"
+    },
+    "copiedStatus": {
+        "message": "Kopiert!"
+    },
+    "minimizeButtonLabel": {
+        "message": "Minimieren"
+    },
+    "restoreButtonLabel": {
+        "message": "Übersetzungsfenster wiederherstellen"
     }
 }

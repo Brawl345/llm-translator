@@ -227,5 +227,17 @@
     },
     "noTextSelectedError": {
         "message": "Please select some text to translate."
+    },
+    "copyButtonLabel": {
+        "message": "Copy translation"
+    },
+    "copiedStatus": {
+        "message": "Copied!"
+    },
+    "minimizeButtonLabel": {
+        "message": "Minimize"
+    },
+    "restoreButtonLabel": {
+        "message": "Restore translation window"
     }
 }

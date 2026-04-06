@@ -39,7 +39,10 @@ class TranslationModal {
                 <div class="llm-modal-container">
                     <div class="llm-modal-header">
                         <h3>${chrome.i18n.getMessage('modalTitle')}</h3>
-                        <button class="llm-modal-close" aria-label="${chrome.i18n.getMessage('closeButtonLabel')}">&times;</button>
+                        <div class="llm-header-buttons">
+                            <button class="llm-modal-minimize" aria-label="${chrome.i18n.getMessage('minimizeButtonLabel')}">&#8722;</button>
+                            <button class="llm-modal-close" aria-label="${chrome.i18n.getMessage('closeButtonLabel')}">&times;</button>
+                        </div>
                     </div>
                     <div class="llm-modal-content">
                         <div class="llm-text-section">
@@ -49,7 +52,12 @@ class TranslationModal {
                             </details>
                         </div>
                         <div class="llm-text-section">
-                            <h4>${chrome.i18n.getMessage('translationLabel')}</h4>
+                            <div class="llm-section-header">
+                                <h4>${chrome.i18n.getMessage('translationLabel')}</h4>
+                                <button class="llm-copy-button" id="copy-translation-btn" style="display: none;" aria-label="${chrome.i18n.getMessage('copyButtonLabel')}">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
                             <div class="llm-text-content" id="translated-text">
                                 <div class="llm-loading">
                                     <div class="llm-spinner"></div>
@@ -75,13 +83,31 @@ class TranslationModal {
 
         this.injectStyles();
         this.shadowRoot.appendChild(modal);
+
+        const minimized = document.createElement('div');
+        minimized.id = 'llm-translator-minimized';
+        minimized.style.display = 'none';
+        minimized.innerHTML = `
+            <button class="llm-restore-button" aria-label="${chrome.i18n.getMessage('restoreButtonLabel')}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                <span>${chrome.i18n.getMessage('modalTitle')}</span>
+            </button>
+        `;
+        this.shadowRoot.appendChild(minimized);
+
         document.body.appendChild(this.modalContainer);
 
         const closeButton = modal.querySelector('.llm-modal-close') as HTMLElement;
+        const minimizeButton = modal.querySelector('.llm-modal-minimize') as HTMLElement;
         const overlay = modal.querySelector('.llm-modal-overlay') as HTMLElement;
         const contextButton = modal.querySelector('#get-context-btn') as HTMLElement;
+        const copyButton = modal.querySelector('#copy-translation-btn') as HTMLElement;
+        const restoreButton = minimized.querySelector('.llm-restore-button') as HTMLElement;
 
         closeButton.addEventListener('click', () => this.hide());
+        minimizeButton.addEventListener('click', () => this.minimize());
+        restoreButton.addEventListener('click', () => this.restore());
+        copyButton.addEventListener('click', () => this.copyTranslation());
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) {
                 this.hide();
@@ -222,6 +248,139 @@ class TranslationModal {
                     background: #4a5568;
                     color: #f7fafc;
                 }
+            }
+
+            .llm-header-buttons {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+
+            .llm-modal-minimize {
+                background: none;
+                border: none;
+                font-size: 22px;
+                line-height: 1;
+                color: #718096;
+                cursor: pointer;
+                padding: 0;
+                width: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 6px;
+                transition: all 0.2s;
+            }
+
+            .llm-modal-minimize:hover {
+                background: #e2e8f0;
+                color: #2d3748;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .llm-modal-minimize {
+                    color: #a0aec0;
+                }
+
+                .llm-modal-minimize:hover {
+                    background: #4a5568;
+                    color: #f7fafc;
+                }
+            }
+
+            .llm-section-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 12px;
+            }
+
+            .llm-section-header h4 {
+                margin: 0;
+            }
+
+            .llm-copy-button {
+                background: none;
+                border: 1px solid #e2e8f0;
+                color: #718096;
+                cursor: pointer;
+                padding: 5px 8px;
+                border-radius: 6px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 12px;
+                font-weight: 500;
+                transition: all 0.2s;
+                white-space: nowrap;
+            }
+
+            .llm-copy-button:hover {
+                background: #edf2f7;
+                border-color: #cbd5e0;
+                color: #2d3748;
+            }
+
+            .llm-copy-button.llm-copied {
+                border-color: #68d391;
+                color: #276749;
+                background: #f0fff4;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .llm-copy-button {
+                    border-color: #4a5568;
+                    color: #a0aec0;
+                }
+
+                .llm-copy-button:hover {
+                    background: #4a5568;
+                    border-color: #718096;
+                    color: #f7fafc;
+                }
+
+                .llm-copy-button.llm-copied {
+                    border-color: #276749;
+                    color: #68d391;
+                    background: #1c4532;
+                }
+            }
+
+            #llm-translator-minimized {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 2147483647;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            }
+
+            .llm-restore-button {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                background: #667eea;
+                color: white;
+                border: none;
+                border-radius: 24px;
+                padding: 10px 16px;
+                font-size: 13px;
+                font-weight: 500;
+                cursor: pointer;
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+                transition: all 0.2s;
+                white-space: nowrap;
+                animation: llm-modal-appear 0.2s ease-out;
+            }
+
+            .llm-restore-button:hover {
+                background: #5a67d8;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+            }
+
+            .llm-restore-button:active {
+                transform: translateY(0);
             }
 
             .llm-modal-content {
@@ -480,6 +639,37 @@ class TranslationModal {
         });
     }
 
+    private resetUI(): void {
+        if (!this.shadowRoot) return;
+
+        this.hasTranslation = false;
+        this.currentTranslation = '';
+        this.isStreaming = false;
+        this.isContextStreaming = false;
+        this.currentContext = '';
+
+        const minimized = this.shadowRoot.querySelector('#llm-translator-minimized') as HTMLElement;
+        minimized.style.display = 'none';
+
+        const copyButton = this.shadowRoot.querySelector('#copy-translation-btn') as HTMLElement;
+        copyButton.style.display = 'none';
+        copyButton.classList.remove('llm-copied');
+        copyButton.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+
+        const contextSection = this.shadowRoot.querySelector('.llm-context-section') as HTMLElement;
+        const contextTextEl = this.shadowRoot.querySelector('#context-text') as HTMLElement;
+        const contextButton = this.shadowRoot.querySelector('#get-context-btn') as HTMLButtonElement;
+        const contextHeading = this.shadowRoot.querySelector('#context-heading') as HTMLElement;
+
+        contextSection.style.display = 'none';
+        contextHeading.style.display = 'none';
+        contextTextEl.style.display = 'none';
+        contextTextEl.textContent = '';
+        contextButton.disabled = false;
+        contextButton.style.display = 'inline-block';
+        contextButton.textContent = chrome.i18n.getMessage('additionalContextButton');
+    }
+
     private show(payload: {
         originalText: string;
         translatedText?: string;
@@ -489,10 +679,13 @@ class TranslationModal {
     }): void {
         if (!this.shadowRoot || !this.modalContainer) return;
 
+        this.resetUI();
+
         const modal = this.shadowRoot.querySelector('#llm-translator-modal') as HTMLElement;
         const originalTextEl = this.shadowRoot.querySelector('#original-text') as HTMLElement;
         const translatedTextEl = this.shadowRoot.querySelector('#translated-text') as HTMLElement;
         const contextSection = this.shadowRoot.querySelector('.llm-context-section') as HTMLElement;
+        const copyButton = this.shadowRoot.querySelector('#copy-translation-btn') as HTMLElement;
 
         originalTextEl.textContent = payload.originalText;
         this.currentOriginalText = payload.originalText;
@@ -500,6 +693,7 @@ class TranslationModal {
         if (payload.isStreaming) {
             this.isStreaming = true;
             this.currentTranslation = '';
+            copyButton.style.display = 'none';
             translatedTextEl.innerHTML = `
                 <div class="llm-loading">
                     <div class="llm-spinner"></div>
@@ -525,6 +719,7 @@ class TranslationModal {
             this.currentTranslation = payload.translatedText;
             this.hasTranslation = true;
             translatedTextEl.textContent = payload.translatedText;
+            copyButton.style.display = 'flex';
             contextSection.style.display = 'block';
         }
 
@@ -553,7 +748,9 @@ class TranslationModal {
             this.hasTranslation = true;
             // Final update with complete text
             translatedTextEl.textContent = this.currentTranslation;
-            // Show context section when streaming is complete
+            // Show copy button and context section when streaming is complete
+            const copyButton = this.shadowRoot.querySelector('#copy-translation-btn') as HTMLElement;
+            copyButton.style.display = 'flex';
             const contextSection = this.shadowRoot.querySelector('.llm-context-section') as HTMLElement;
             contextSection.style.display = 'block';
         } else {
@@ -673,6 +870,48 @@ class TranslationModal {
         `;
     }
 
+    private minimize(): void {
+        if (!this.shadowRoot) return;
+
+        const modal = this.shadowRoot.querySelector('#llm-translator-modal') as HTMLElement;
+        const minimized = this.shadowRoot.querySelector('#llm-translator-minimized') as HTMLElement;
+        if (!modal || !minimized) return;
+
+        modal.style.display = 'none';
+        minimized.style.display = 'block';
+    }
+
+    private restore(): void {
+        if (!this.shadowRoot) return;
+
+        const modal = this.shadowRoot.querySelector('#llm-translator-modal') as HTMLElement;
+        const minimized = this.shadowRoot.querySelector('#llm-translator-minimized') as HTMLElement;
+        if (!modal || !minimized) return;
+
+        minimized.style.display = 'none';
+        modal.style.display = 'block';
+    }
+
+    private copyTranslation(): void {
+        if (!this.currentTranslation || !this.shadowRoot) return;
+
+        navigator.clipboard.writeText(this.currentTranslation).then(() => {
+            const copyButton = this.shadowRoot?.querySelector('#copy-translation-btn') as HTMLElement;
+            if (!copyButton) return;
+
+            copyButton.classList.add('llm-copied');
+            copyButton.innerHTML = `
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                ${chrome.i18n.getMessage('copiedStatus')}
+            `;
+
+            setTimeout(() => {
+                copyButton.classList.remove('llm-copied');
+                copyButton.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+            }, 2000);
+        });
+    }
+
     private hide(): void {
         if (!this.shadowRoot) return;
 
@@ -681,25 +920,8 @@ class TranslationModal {
 
         modal.style.display = 'none';
         this.isVisible = false;
-        this.hasTranslation = false;
         this.currentOriginalText = '';
-        this.currentTranslation = '';
-        this.isContextStreaming = false;
-        this.currentContext = '';
-
-        // Reset context section
-        const contextSection = this.shadowRoot.querySelector('.llm-context-section') as HTMLElement;
-        const contextTextEl = this.shadowRoot.querySelector('#context-text') as HTMLElement;
-        const contextButton = this.shadowRoot.querySelector('#get-context-btn') as HTMLButtonElement;
-        const contextHeading = this.shadowRoot.querySelector('#context-heading') as HTMLElement;
-        
-        contextSection.style.display = 'none';
-        contextHeading.style.display = 'none';
-        contextTextEl.style.display = 'none';
-        contextTextEl.textContent = '';
-        contextButton.disabled = false;
-        contextButton.style.display = 'inline-block';
-        contextButton.textContent = chrome.i18n.getMessage('additionalContextButton');
+        this.resetUI();
     }
 }
 
