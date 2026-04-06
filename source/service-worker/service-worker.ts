@@ -26,9 +26,11 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     });
 
     if (details.reason === 'update') {
-        await migrateSettings();
-        await chrome.storage.local.set({ showMigrationNotice: true });
-        await chrome.runtime.openOptionsPage();
+        const migrated = await migrateSettings();
+        if (migrated) {
+            await chrome.storage.local.set({ showMigrationNotice: true });
+            await chrome.runtime.openOptionsPage();
+        }
         return;
     }
 
@@ -100,7 +102,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, _sendResponse) => {
     }
 });
 
-async function migrateSettings(): Promise<void> {
+async function migrateSettings(): Promise<boolean> {
     const result = await chrome.storage.sync.get(['model', 'reasoningEffort', 'availableModels']);
     const updates: Record<string, unknown> = {};
 
@@ -116,9 +118,12 @@ async function migrateSettings(): Promise<void> {
         await chrome.storage.sync.set(updates);
     }
 
-    if (Object.hasOwn(result, 'availableModels')) {
+    const removedAvailableModels = Object.hasOwn(result, 'availableModels');
+    if (removedAvailableModels) {
         await chrome.storage.sync.remove('availableModels');
     }
+
+    return Object.keys(updates).length > 0 || removedAvailableModels;
 }
 
 async function handleTranslation(selectedText: string, tabId: number): Promise<void> {
