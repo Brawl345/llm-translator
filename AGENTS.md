@@ -33,7 +33,24 @@ script, and options page. All message types and interfaces are defined in `sourc
 **Streaming Architecture**: Both translation and additional context use server-sent event streaming with chunk-based
 updates. Content script handles real-time display updates while service worker manages stream parsing.
 
-## Build Commands
+## Release Process
+
+1. **Determine the next version**: Check `git tag | sort -V | tail -1` for the latest tag and increment accordingly (patch = bugfix, minor = new feature).
+2. **Update `public/manifest.json`**: Set `"version"` to the new version number.
+3. **Run `npm run release`**: Syncs `package.json`, builds `.crx` and `.xpi` into `output/`, updates `updates.json` and `updates.xml`.
+4. **Commit**: Stage and commit `public/manifest.json`, `package.json`, `updates.json`, `updates.xml`, and all changed source files. Use `"$VERSION: <short summary>"` as the commit message.
+5. **Tag and push**: Create an annotated tag with the same bullet points as the release notes, then push — ignore rejections for already-existing old tags:
+   ```bash
+   git tag -a $VERSION -m "$VERSION: <bullet points of changes>" && git push && git push origin $VERSION
+   ```
+6. **Create GitHub release** using `gh`:
+   ```bash
+   gh release create $VERSION \
+     output/llm-translator-$VERSION.crx \
+     output/llm-translator-$VERSION.xpi \
+     --title "$VERSION" \
+     --notes "<bullet points of changes>"
+   ```
 
 - `npm run build`: Production build (always use this, never `npm run dev`)
 - `npm run lint:types`: TypeScript type checking
