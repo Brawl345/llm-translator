@@ -13,7 +13,7 @@ import type {
 const CONTEXT_MENU_ID = 'translate-text';
 const DEFAULT_MODEL: SupportedModel = 'gpt-5.4';
 const DEFAULT_REASONING_EFFORT: ReasoningEffort = 'none';
-const SUPPORTED_MODELS: SupportedModel[] = ['gpt-5.4', 'gpt-5.4-mini', 'gpt-5.4-nano'];
+const SUPPORTED_MODELS: SupportedModel[] = ['gpt-5.4', 'gpt-5.5', 'gpt-5.4-mini', 'gpt-5.4-nano'];
 const REASONING_EFFORTS: ReasoningEffort[] = ['none', 'low', 'medium', 'high'];
 const CONTEXT_LIMIT_TOKENS = 1047576;
 const CHARS_PER_TOKEN = 4;
@@ -106,7 +106,7 @@ async function migrateSettings(): Promise<boolean> {
     const result = await chrome.storage.sync.get(['model', 'reasoningEffort', 'availableModels']);
     const updates: Record<string, unknown> = {};
 
-    if (!isSupportedModel(result.model) || result.model !== DEFAULT_MODEL) {
+    if (!isSupportedModel(result.model)) {
         updates.model = DEFAULT_MODEL;
     }
 

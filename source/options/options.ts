@@ -9,7 +9,7 @@ interface Settings {
 
 const DEFAULT_MODEL: SupportedModel = 'gpt-5.4';
 const DEFAULT_REASONING_EFFORT: ReasoningEffort = 'none';
-const SUPPORTED_MODELS: SupportedModel[] = ['gpt-5.4', 'gpt-5.4-mini', 'gpt-5.4-nano'];
+const SUPPORTED_MODELS: SupportedModel[] = ['gpt-5.4', 'gpt-5.5', 'gpt-5.4-mini', 'gpt-5.4-nano'];
 const REASONING_EFFORTS: ReasoningEffort[] = ['none', 'low', 'medium', 'high'];
 
 class OptionsPage {
