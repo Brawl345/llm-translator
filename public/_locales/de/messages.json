@@ -1,243 +1,204 @@
 {
-    "extensionName": {
-        "message": "LLM Translator"
-    },
-    "extensionDescription": {
-        "message": "Übersetze Text mit einem LLM"
-    },
-    "contextMenuTitle": {
-        "message": "Mit LLM übersetzen"
-    },
-    "noApiKeyError": {
-        "message": "Kein API-Schlüssel konfiguriert. Bitte richte deinen OpenAI API-Schlüssel in den Erweiterungseinstellungen ein."
-    },
-    "translationFailedError": {
-        "message": "Übersetzung fehlgeschlagen: $ERROR_MESSAGE$",
-        "placeholders": {
-            "error_message": {
-                "content": "$1",
-                "example": "Ungültiger API-Schlüssel"
-            }
-        }
-    },
-    "noTranslationError": {
-        "message": "Keine Übersetzung von der API erhalten"
-    },
-    "streamReaderError": {
-        "message": "Verbindungsfehler beim Übersetzen"
-    },
-    "modalTitle": {
-        "message": "LLM-Übersetzung"
-    },
-    "originalTextLabel": {
-        "message": "Originaler Text"
-    },
-    "translationLabel": {
-        "message": "Übersetzung"
-    },
-    "translatingStatus": {
-        "message": "Übersetze..."
-    },
-    "closeButtonLabel": {
-        "message": "Schließen"
-    },
-    "settingsTitle": {
-        "message": "LLM-Translator-Einstellungen"
-    },
-    "apiKeyLabel": {
-        "message": "OpenAI API-Schlüssel:"
-    },
-    "apiKeyPlaceholder": {
-        "message": "sk-..."
-    },
-    "apiKeyDescription": {
-        "message": "Dein API-Schlüssel wird sicher gespeichert und nur für Übersetzungsanfragen verwendet."
-    },
-    "getApiKeyLink": {
-        "message": "Hol dir deinen API-Schlüssel"
-    },
-    "checkApiKeyButton": {
-        "message": "API-Schlüssel prüfen"
-    },
-    "checkingApiKeyButton": {
-        "message": "API-Schlüssel wird geprüft..."
-    },
-    "checkingApiKeyStatus": {
-        "message": "API-Schlüssel wird geprüft..."
-    },
-    "apiKeyValidSuccess": {
-        "message": "API-Schlüssel ist gültig."
-    },
-    "failedToCheckApiKey": {
-        "message": "Fehler beim Prüfen des API-Schlüssels: $ERROR_MESSAGE$",
-        "placeholders": {
-            "error_message": {
-                "content": "$1",
-                "example": "Ungültiger API-Schlüssel"
-            }
-        }
-    },
-    "failedToCheckApiKeyGeneric": {
-        "message": "Fehler beim Prüfen des API-Schlüssels. Bitte überprüfe deine Internetverbindung und deinen API-Schlüssel."
-    },
-    "modelLabel": {
-        "message": "Modell:"
-    },
-    "reasoningEffortLabel": {
-        "message": "Reasoning-Aufwand:"
-    },
-    "reasoningEffortNone": {
-        "message": "Keiner"
-    },
-    "reasoningEffortLow": {
-        "message": "Niedrig"
-    },
-    "reasoningEffortMedium": {
-        "message": "Mittel"
-    },
-    "reasoningEffortHigh": {
-        "message": "Hoch"
-    },
-    "migrationNotice": {
-        "message": "Die Modellauswahl wurde vereinfacht. Bitte überprüfe deine Einstellungen. Das Modell wurde auf gpt-5.4 umgestellt und der Reasoning-Aufwand steht jetzt standardmäßig auf Keiner."
-    },
-    "cardModelTitle": {
-        "message": "Modell"
-    },
-    "cardLanguageTitle": {
-        "message": "Sprache"
-    },
-    "saveSettingsButton": {
-        "message": "Einstellungen speichern"
-    },
-    "savingSettingsButton": {
-        "message": "Speichere..."
-    },
-    "failedToLoadSettings": {
-        "message": "Fehler beim Laden der Einstellungen"
-    },
-    "pleaseEnterApiKey": {
-        "message": "Bitte gib einen API-Schlüssel ein"
-    },
-    "invalidApiKeyFormat": {
-        "message": "Ungültiges API-Schlüssel-Format. OpenAI API-Schlüssel beginnen mit \"sk-\""
-    },
-    "pleaseSelectModel": {
-        "message": "Bitte wähle ein Modell aus"
-    },
-    "pleaseSelectReasoningEffort": {
-        "message": "Bitte wähle einen Reasoning-Aufwand aus"
-    },
-    "targetLanguageLabel": {
-        "message": "Zielsprache:"
-    },
-    "germanLanguage": {
-        "message": "Deutsch"
-    },
-    "englishLanguage": {
-        "message": "Englisch"
-    },
-    "frenchLanguage": {
-        "message": "Französisch"
-    },
-    "spanishLanguage": {
-        "message": "Spanisch"
-    },
-    "italianLanguage": {
-        "message": "Italienisch"
-    },
-    "portugueseLanguage": {
-        "message": "Portugiesisch"
-    },
-    "dutchLanguage": {
-        "message": "Niederländisch"
-    },
-    "russianLanguage": {
-        "message": "Russisch"
-    },
-    "japaneseLanguage": {
-        "message": "Japanisch"
-    },
-    "chineseLanguage": {
-        "message": "Chinesisch"
-    },
-    "koreanLanguage": {
-        "message": "Koreanisch"
-    },
-    "arabicLanguage": {
-        "message": "Arabisch"
-    },
-    "otherLanguage": {
-        "message": "Andere..."
-    },
-    "customTargetLanguageLabel": {
-        "message": "Benutzerdefinierte Sprache:"
-    },
-    "customTargetLanguagePlaceholder": {
-        "message": "Gib die Zielsprache ein (z.B. Latein, Klingonisch, etc.)"
-    },
-    "pleaseSelectTargetLanguage": {
-        "message": "Bitte wähle eine Zielsprache aus oder gib sie an"
-    },
-    "settingsSavedSuccess": {
-        "message": "Einstellungen erfolgreich gespeichert!"
-    },
-    "failedToSaveSettings": {
-        "message": "Fehler beim Speichern der Einstellungen. Bitte versuche es erneut."
-    },
-    "pleaseEnterApiKeyFirst": {
-        "message": "Bitte gib zuerst einen API-Schlüssel ein"
-    },
-    "additionalContextButton": {
-        "message": "Zusätzlicher Kontext"
-    },
-    "additionalContextLabel": {
-        "message": "Zusätzlicher Kontext"
-    },
-    "gettingContextStatus": {
-        "message": "Zusätzlicher Kontext wird abgerufen..."
-    },
-    "contextFailedError": {
-        "message": "Fehler beim Abrufen des zusätzlichen Kontexts: $ERROR_MESSAGE$",
-        "placeholders": {
-            "error_message": {
-                "content": "$1",
-                "example": "Ungültiger API-Schlüssel"
-            }
-        }
-    },
-    "noContextNeeded": {
-        "message": "Keine zusätzlichen kulturellen oder sprachlichen Erklärungen erforderlich."
-    },
-    "textTooLongError": {
-        "message": "Der Text ist zu lang ($1$ Zeichen). Bitte versuche es mit einem kürzeren Text (maximal $2$ Zeichen erlaubt).",
-        "placeholders": {
-            "1": {
-                "content": "$1",
-                "example": "50000"
-            },
-            "2": {
-                "content": "$2", 
-                "example": "45000"
-            }
-        }
-    },
-    "disclaimerText": {
-        "message": "LLMs können Fehler machen, überprüfe wichtige Informationen."
-    },
-    "noTextSelectedError": {
-        "message": "Bitte wähle Text zum Übersetzen aus."
-    },
-    "copyButtonLabel": {
-        "message": "Übersetzung kopieren"
-    },
-    "copiedStatus": {
-        "message": "Kopiert!"
-    },
-    "minimizeButtonLabel": {
-        "message": "Minimieren"
-    },
-    "restoreButtonLabel": {
-        "message": "Übersetzungsfenster wiederherstellen"
+  "extensionName": {
+    "message": "LLM Translator"
+  },
+  "extensionDescription": {
+    "message": "Übersetze Text mit einem LLM"
+  },
+  "contextMenuTitle": {
+    "message": "Mit LLM übersetzen"
+  },
+  "noApiKeyError": {
+    "message": "Kein API-Schlüssel konfiguriert. Bitte richte deinen OpenAI API-Schlüssel in den Erweiterungseinstellungen ein."
+  },
+  "translationFailedError": {
+    "message": "Übersetzung fehlgeschlagen: $ERROR_MESSAGE$",
+    "placeholders": {
+      "error_message": {
+        "content": "$1",
+        "example": "Ungültiger API-Schlüssel"
+      }
     }
+  },
+  "streamReaderError": {
+    "message": "Verbindungsfehler beim Übersetzen"
+  },
+  "modalTitle": {
+    "message": "LLM-Übersetzung"
+  },
+  "originalTextLabel": {
+    "message": "Originaler Text"
+  },
+  "translationLabel": {
+    "message": "Übersetzung"
+  },
+  "translatingStatus": {
+    "message": "Übersetze..."
+  },
+  "closeButtonLabel": {
+    "message": "Schließen"
+  },
+  "settingsTitle": {
+    "message": "LLM-Translator-Einstellungen"
+  },
+  "apiKeyLabel": {
+    "message": "OpenAI API-Schlüssel:"
+  },
+  "apiKeyPlaceholder": {
+    "message": "sk-..."
+  },
+  "apiKeyDescription": {
+    "message": "Dein API-Schlüssel wird sicher gespeichert und nur für Übersetzungsanfragen verwendet."
+  },
+  "getApiKeyLink": {
+    "message": "Hol dir deinen API-Schlüssel"
+  },
+  "saveAndCheckButton": {
+    "message": "Speichern & Prüfen"
+  },
+  "checkingApiKeyButton": {
+    "message": "API-Schlüssel wird geprüft..."
+  },
+  "apiKeyValidSuccess": {
+    "message": "API-Schlüssel ist gültig."
+  },
+  "failedToCheckApiKey": {
+    "message": "Fehler beim Prüfen des API-Schlüssels: $ERROR_MESSAGE$",
+    "placeholders": {
+      "error_message": {
+        "content": "$1",
+        "example": "Ungültiger API-Schlüssel"
+      }
+    }
+  },
+  "modelLabel": {
+    "message": "Modell:"
+  },
+  "reasoningEffortLabel": {
+    "message": "Reasoning-Aufwand:"
+  },
+  "reasoningEffortNone": {
+    "message": "Keiner"
+  },
+  "reasoningEffortLow": {
+    "message": "Niedrig"
+  },
+  "reasoningEffortMedium": {
+    "message": "Mittel"
+  },
+  "reasoningEffortHigh": {
+    "message": "Hoch"
+  },
+  "migrationNotice": {
+    "message": "Die Modellauswahl wurde vereinfacht. Bitte überprüfe deine Einstellungen. Das Modell wurde auf gpt-5.4 umgestellt und der Reasoning-Aufwand steht jetzt standardmäßig auf Keiner."
+  },
+  "cardModelTitle": {
+    "message": "Modell"
+  },
+  "cardLanguageTitle": {
+    "message": "Sprache"
+  },
+  "invalidApiKeyFormat": {
+    "message": "Ungültiges API-Schlüssel-Format. OpenAI API-Schlüssel beginnen mit \"sk-\""
+  },
+  "targetLanguageLabel": {
+    "message": "Zielsprache:"
+  },
+  "germanLanguage": {
+    "message": "Deutsch"
+  },
+  "englishLanguage": {
+    "message": "Englisch"
+  },
+  "frenchLanguage": {
+    "message": "Französisch"
+  },
+  "spanishLanguage": {
+    "message": "Spanisch"
+  },
+  "italianLanguage": {
+    "message": "Italienisch"
+  },
+  "portugueseLanguage": {
+    "message": "Portugiesisch"
+  },
+  "dutchLanguage": {
+    "message": "Niederländisch"
+  },
+  "russianLanguage": {
+    "message": "Russisch"
+  },
+  "japaneseLanguage": {
+    "message": "Japanisch"
+  },
+  "chineseLanguage": {
+    "message": "Chinesisch"
+  },
+  "koreanLanguage": {
+    "message": "Koreanisch"
+  },
+  "arabicLanguage": {
+    "message": "Arabisch"
+  },
+  "otherLanguage": {
+    "message": "Andere..."
+  },
+  "customTargetLanguageLabel": {
+    "message": "Benutzerdefinierte Sprache:"
+  },
+  "customTargetLanguagePlaceholder": {
+    "message": "Gib die Zielsprache ein (z.B. Latein, Klingonisch, etc.)"
+  },
+  "pleaseEnterApiKeyFirst": {
+    "message": "Bitte gib zuerst einen API-Schlüssel ein"
+  },
+  "additionalContextButton": {
+    "message": "Zusätzlicher Kontext"
+  },
+  "additionalContextLabel": {
+    "message": "Zusätzlicher Kontext"
+  },
+  "gettingContextStatus": {
+    "message": "Zusätzlicher Kontext wird abgerufen..."
+  },
+  "contextFailedError": {
+    "message": "Fehler beim Abrufen des zusätzlichen Kontexts: $ERROR_MESSAGE$",
+    "placeholders": {
+      "error_message": {
+        "content": "$1",
+        "example": "Ungültiger API-Schlüssel"
+      }
+    }
+  },
+  "textTooLongError": {
+    "message": "Der Text ist zu lang ($1$ Zeichen). Bitte versuche es mit einem kürzeren Text (maximal $2$ Zeichen erlaubt).",
+    "placeholders": {
+      "1": {
+        "content": "$1",
+        "example": "50000"
+      },
+      "2": {
+        "content": "$2",
+        "example": "45000"
+      }
+    }
+  },
+  "disclaimerText": {
+    "message": "LLMs können Fehler machen, überprüfe wichtige Informationen."
+  },
+  "noTextSelectedError": {
+    "message": "Bitte wähle Text zum Übersetzen aus."
+  },
+  "copyButtonLabel": {
+    "message": "Übersetzung kopieren"
+  },
+  "copiedStatus": {
+    "message": "Kopiert!"
+  },
+  "minimizeButtonLabel": {
+    "message": "Minimieren"
+  },
+  "restoreButtonLabel": {
+    "message": "Übersetzungsfenster wiederherstellen"
+  }
 }

@@ -1,208 +1,168 @@
 #!/usr/bin/env tsx
 
-import {execSync} from 'node:child_process';
-import {existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync,} from 'node:fs';
-import {join, resolve} from 'node:path';
+import { execSync } from 'node:child_process';
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { join, resolve } from 'node:path';
 
 interface PackageJson {
   name: string;
   version: string;
-  repository?: {
-    url?: string;
-  };
-}
-
-interface Manifest {
-  version: string;
-  browser_specific_settings?: {
-    gecko?: {
-      id?: string;
-    };
-  };
-}
-
-interface FirefoxUpdate {
-  version: string;
-  update_link: string;
-  update_info_url: string;
-}
-
-interface FirefoxUpdateManifest {
-  addons: {
-    [key: string]: {
-      updates: FirefoxUpdate[];
-    };
-  };
+  repository?: { url?: string };
 }
 
 const CHROME_EXTENSION_ID = 'jldajcpbpceomijamlamdkgmeadnndjn';
+const GECKO_ID = 'llm-translator@brawl345.github.com';
+const CHROME_BIN =
+  '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary';
 
-function buildExtensions() {
-  const manifestPath = './public/manifest.json';
-  const manifest: Manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-  const version = manifest.version;
-
-  console.log(`🚀 Creating release for v${version}...`);
-  console.log('');
-
-  const packageJson: PackageJson = JSON.parse(
-    readFileSync('package.json', 'utf-8'),
-  );
-
-  console.log('📝 Syncing package.json version...');
-  packageJson.version = version;
-  writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
-  console.log('');
-
-  console.log('📦 Building extension...');
-  execSync('npm run build', { stdio: 'inherit' });
-  console.log('');
-
-  const outputDir = 'output';
-  if (!existsSync(outputDir)) {
-    mkdirSync(outputDir, { recursive: true });
-  }
-
-  console.log('🦊 Building Firefox extension...');
-  const firefoxOutputFile = `llm-translator-${version}.xpi`;
-  const firefoxOutputPath = join(outputDir, firefoxOutputFile);
-
-  execSync(
-    `web-ext build --source-dir=./public --artifacts-dir=./output --filename=${firefoxOutputFile} --overwrite-dest`,
-    { stdio: 'ignore' },
-  );
-
-  console.log(`✅ Built successfully: ${firefoxOutputPath}`);
-  console.log('');
-
-  console.log('🌐 Building Chrome extension...');
-  const publicPath = resolve('public');
-  const pemPath = resolve('public.pem');
-  const crxPath = resolve('public.crx');
-
-  if (!existsSync(pemPath)) {
-    console.error(
-      '❌ public.pem file not found. Cannot sign Chrome extension.',
-    );
-    process.exit(1);
-  }
-
-  if (existsSync(crxPath)) {
-    unlinkSync(crxPath);
-  }
-
-  execSync(
-    `/Applications/Google\\ Chrome\\ Canary.app/Contents/MacOS/Google\\ Chrome\\ Canary --pack-extension="${publicPath}" --pack-extension-key="${pemPath}"`,
-    { stdio: 'inherit' },
-  );
-
-  if (!existsSync(crxPath)) {
-    console.error('❌ Failed to create public.crx file.');
-    process.exit(1);
-  }
-
-  const chromeOutputFile = `llm-translator-${version}.crx`;
-  const chromeOutputPath = join(outputDir, chromeOutputFile);
-  renameSync(crxPath, chromeOutputPath);
-
-  console.log(`✅ Built successfully: ${chromeOutputPath}`);
-  console.log('');
-
-  return { packageJson, version, manifest };
+function fail(message: string): never {
+  console.error(`❌ ${message}`);
+  process.exit(1);
 }
 
-function updateFirefoxJson(
-  packageJson: PackageJson,
-  version: string,
-  manifest: Manifest,
-) {
-  console.log('📝 Updating Firefox update manifest...');
+function repoUrl(pkg: PackageJson): string {
+  let url = pkg.repository?.url;
+  if (!url) fail('Repository URL not found in package.json');
+  if (url.startsWith('git+')) url = url.slice(4);
+  if (url.endsWith('.git')) url = url.slice(0, -4);
+  return url;
+}
 
-  const packageName = packageJson.name;
-  const repositoryUrl = packageJson.repository?.url;
-  if (!repositoryUrl) {
-    console.error('❌ Repository URL not found in package.json');
-    process.exit(1);
-  }
+function readReleaseNotes(version: string): string {
+  if (!existsSync('CHANGES.md')) fail('CHANGES.md not found');
+  const sections = readFileSync('CHANGES.md', 'utf-8').split(/^## /m);
+  const match =
+    sections.find((s) => s.trimStart().startsWith(`v${version}`)) ??
+    sections.find((s) => s.trim().length > 0);
+  if (!match) fail('No release notes found in CHANGES.md');
+  // Drop the heading line, keep the bullet points.
+  return match.split('\n').slice(1).join('\n').trim();
+}
 
-  let repoUrl = repositoryUrl;
-  if (repoUrl.startsWith('git+')) {
-    repoUrl = repoUrl.substring(4);
-  }
-  if (repoUrl.endsWith('.git')) {
-    repoUrl = repoUrl.slice(0, -4);
-  }
+function buildArtifacts(pkg: PackageJson, version: string) {
+  const outputDir = resolve('output');
+  mkdirSync(outputDir, { recursive: true });
 
-  const firefoxId = manifest.browser_specific_settings?.gecko?.id;
-  if (!firefoxId) {
-    console.error('❌ Firefox extension ID not found in manifest.json');
-    process.exit(1);
-  }
+  console.log('📦 Building Chrome extension...');
+  execSync('npm run build', { stdio: 'inherit' });
 
-  const jsonContent: FirefoxUpdateManifest = {
+  console.log('🦊 Building Firefox extension...');
+  execSync('npm run build:firefox', { stdio: 'inherit' });
+
+  console.log('🌐 Packing Chrome CRX...');
+  const pemPath = resolve('public.pem');
+  if (!existsSync(pemPath)) {
+    fail(
+      'public.pem not found — do not regenerate it, the extension ID would change.',
+    );
+  }
+  const chromeDir = resolve('.output', 'chrome-mv3');
+  const packedCrx = `${chromeDir}.crx`;
+  if (existsSync(packedCrx)) rmSync(packedCrx);
+  execSync(
+    `"${CHROME_BIN}" --pack-extension="${chromeDir}" --pack-extension-key="${pemPath}"`,
+    { stdio: 'inherit' },
+  );
+  if (!existsSync(packedCrx)) fail('Failed to create CRX file.');
+  const crxOut = join(outputDir, `${pkg.name}-${version}.crx`);
+  renameSync(packedCrx, crxOut);
+  console.log(`✅ ${crxOut}`);
+
+  console.log('🦊 Packing Firefox XPI (unsigned)...');
+  const firefoxDir = resolve('.output', 'firefox-mv3');
+  const xpiOut = join(outputDir, `${pkg.name}-${version}.xpi`);
+  if (existsSync(xpiOut)) rmSync(xpiOut);
+  execSync(`zip -r -X "${xpiOut}" .`, { cwd: firefoxDir, stdio: 'inherit' });
+  console.log(`✅ ${xpiOut}`);
+
+  return { crxOut, xpiOut };
+}
+
+function writeUpdateManifests(pkg: PackageJson, version: string, repo: string) {
+  console.log('📝 Writing updates.xml (Chrome)...');
+  const crxUrl = `${repo}/releases/download/${version}/${pkg.name}-${version}.crx`;
+  writeFileSync(
+    'updates.xml',
+    `<?xml version='1.0' encoding='UTF-8'?>
+<gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
+  <app appid='${CHROME_EXTENSION_ID}'>
+    <updatecheck codebase='${crxUrl}' version='${version}' />
+  </app>
+</gupdate>`,
+  );
+
+  console.log('📝 Writing updates.json (Firefox)...');
+  const xpiUrl = `${repo}/releases/download/${version}/${pkg.name}-${version}.xpi`;
+  const repoPath = repo.replace('https://github.com/', '');
+  const updates = {
     addons: {
-      [firefoxId]: {
+      [GECKO_ID]: {
         updates: [
           {
-            version: version,
-            update_link: `${repoUrl}/releases/download/${version}/${packageName}-${version}.xpi`,
-              update_info_url: `https://raw.githubusercontent.com/Brawl345/llm-translator/refs/tags/${version}/CHANGES.md`,
+            version,
+            update_link: xpiUrl,
+            update_info_url: `https://raw.githubusercontent.com/${repoPath}/refs/tags/${version}/CHANGES.md`,
           },
         ],
       },
     },
   };
-
-  writeFileSync('updates.json', JSON.stringify(jsonContent, null, 2));
-  console.log('✅ updates.json updated');
+  writeFileSync('updates.json', `${JSON.stringify(updates, null, 2)}\n`);
 }
 
-function updateChromeXml(packageJson: PackageJson, version: string) {
-  console.log('📝 Updating Chrome update manifest...');
+function publish(
+  version: string,
+  notes: string,
+  crxOut: string,
+  xpiOut: string,
+) {
+  const tagMsg = `${version}\n\n${notes}`;
+  console.log('🔖 Committing, tagging and pushing...');
+  execSync('git add package.json updates.json updates.xml CHANGES.md', {
+    stdio: 'inherit',
+  });
+  execSync(`git commit -m "${version}: release"`, { stdio: 'inherit' });
+  execSync(`git tag -a ${version} -F -`, {
+    input: tagMsg,
+    stdio: ['pipe', 'inherit', 'inherit'],
+  });
+  execSync('git push', { stdio: 'inherit' });
+  execSync(`git push origin ${version}`, { stdio: 'inherit' });
 
-  const packageName = packageJson.name;
-  const repositoryUrl = packageJson.repository?.url;
-  if (!repositoryUrl) {
-    console.error('❌ Repository URL not found in package.json');
-    process.exit(1);
-  }
-
-  let repoUrl = repositoryUrl;
-  if (repoUrl.startsWith('git+')) {
-    repoUrl = repoUrl.substring(4);
-  }
-  if (repoUrl.endsWith('.git')) {
-    repoUrl = repoUrl.slice(0, -4);
-  }
-
-  const xmlContent = `<?xml version='1.0' encoding='UTF-8'?>
-<gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
-  <app appid='${CHROME_EXTENSION_ID}'>
-    <updatecheck codebase='${repoUrl}/releases/download/${version}/${packageName}-${version}.crx' version='${version}' />
-  </app>
-</gupdate>`;
-
-  writeFileSync('updates.xml', xmlContent);
-  console.log('✅ updates.xml updated');
+  console.log('🚀 Creating GitHub release...');
+  execSync(
+    `gh release create ${version} "${crxOut}" "${xpiOut}" --title ${version} --notes-file -`,
+    { input: notes, stdio: ['pipe', 'inherit', 'inherit'] },
+  );
 }
 
 function main() {
-  const { packageJson, version, manifest } = buildExtensions();
+  const version = process.argv[2];
+  if (!version || !/^\d+\.\d+\.\d+$/.test(version)) {
+    fail('Usage: npm run release <version>  (e.g. 2.0.0)');
+  }
 
-  // Update manifests
-  updateFirefoxJson(packageJson, version, manifest);
-  updateChromeXml(packageJson, version);
+  const pkg: PackageJson = JSON.parse(readFileSync('package.json', 'utf-8'));
+  const repo = repoUrl(pkg);
+  const notes = readReleaseNotes(version);
 
-  console.log('');
-  console.log(`🎉 Release v${version} created successfully!`);
-  console.log('');
-  console.log('📁 Generated files:');
-  console.log(`   output/llm-translator-${version}.xpi`);
-  console.log(`   output/llm-translator-${version}.crx`);
-  console.log('   updates.json');
-  console.log('   updates.xml');
+  console.log(`🎯 Releasing v${version}\n`);
+
+  pkg.version = version;
+  writeFileSync('package.json', `${JSON.stringify(pkg, null, 2)}\n`);
+
+  const { crxOut, xpiOut } = buildArtifacts(pkg, version);
+  writeUpdateManifests(pkg, version, repo);
+  publish(version, notes, crxOut, xpiOut);
+
+  console.log(`\n🎉 Release v${version} published!`);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main();
-}
+main();

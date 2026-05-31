@@ -1,243 +1,204 @@
 {
-    "extensionName": {
-        "message": "LLM Translator"
-    },
-    "extensionDescription": {
-        "message": "Translate text using an LLM"
-    },
-    "contextMenuTitle": {
-        "message": "Translate via LLM"
-    },
-    "noApiKeyError": {
-        "message": "No API key configured. Please set up your OpenAI API key in the extension options."
-    },
-    "translationFailedError": {
-        "message": "Translation failed: $ERROR_MESSAGE$",
-        "placeholders": {
-            "error_message": {
-                "content": "$1",
-                "example": "Invalid API key"
-            }
-        }
-    },
-    "noTranslationError": {
-        "message": "No translation received from the API"
-    },
-    "streamReaderError": {
-        "message": "Connection error while translating"
-    },
-    "modalTitle": {
-        "message": "LLM Translation"
-    },
-    "originalTextLabel": {
-        "message": "Original Text"
-    },
-    "translationLabel": {
-        "message": "Translation"
-    },
-    "translatingStatus": {
-        "message": "Translating..."
-    },
-    "closeButtonLabel": {
-        "message": "Close"
-    },
-    "settingsTitle": {
-        "message": "LLM Translator Settings"
-    },
-    "apiKeyLabel": {
-        "message": "OpenAI API Key:"
-    },
-    "apiKeyPlaceholder": {
-        "message": "sk-..."
-    },
-    "apiKeyDescription": {
-        "message": "Your API key is stored securely and only used for translation requests."
-    },
-    "getApiKeyLink": {
-        "message": "Get your API key"
-    },
-    "checkApiKeyButton": {
-        "message": "Check API Key"
-    },
-    "checkingApiKeyButton": {
-        "message": "Checking API Key..."
-    },
-    "checkingApiKeyStatus": {
-        "message": "Checking API key..."
-    },
-    "apiKeyValidSuccess": {
-        "message": "API key is valid."
-    },
-    "failedToCheckApiKey": {
-        "message": "Failed to check API key: $ERROR_MESSAGE$",
-        "placeholders": {
-            "error_message": {
-                "content": "$1",
-                "example": "Invalid API key"
-            }
-        }
-    },
-    "failedToCheckApiKeyGeneric": {
-        "message": "Failed to check API key. Please check your internet connection and API key."
-    },
-    "modelLabel": {
-        "message": "Model:"
-    },
-    "reasoningEffortLabel": {
-        "message": "Reasoning effort:"
-    },
-    "reasoningEffortNone": {
-        "message": "None"
-    },
-    "reasoningEffortLow": {
-        "message": "Low"
-    },
-    "reasoningEffortMedium": {
-        "message": "Medium"
-    },
-    "reasoningEffortHigh": {
-        "message": "High"
-    },
-    "migrationNotice": {
-        "message": "The model selection was simplified. Please review your settings. The model has been switched to gpt-5.4 and reasoning effort now defaults to None."
-    },
-    "cardModelTitle": {
-        "message": "Model"
-    },
-    "cardLanguageTitle": {
-        "message": "Language"
-    },
-    "saveSettingsButton": {
-        "message": "Save Settings"
-    },
-    "savingSettingsButton": {
-        "message": "Saving..."
-    },
-    "failedToLoadSettings": {
-        "message": "Failed to load settings"
-    },
-    "pleaseEnterApiKey": {
-        "message": "Please enter an API key"
-    },
-    "invalidApiKeyFormat": {
-        "message": "Invalid API key format. OpenAI API keys start with \"sk-\""
-    },
-    "pleaseSelectModel": {
-        "message": "Please select a model"
-    },
-    "pleaseSelectReasoningEffort": {
-        "message": "Please select a reasoning effort"
-    },
-    "targetLanguageLabel": {
-        "message": "Target Language:"
-    },
-    "germanLanguage": {
-        "message": "German"
-    },
-    "englishLanguage": {
-        "message": "English"
-    },
-    "frenchLanguage": {
-        "message": "French"
-    },
-    "spanishLanguage": {
-        "message": "Spanish"
-    },
-    "italianLanguage": {
-        "message": "Italian"
-    },
-    "portugueseLanguage": {
-        "message": "Portuguese"
-    },
-    "dutchLanguage": {
-        "message": "Dutch"
-    },
-    "russianLanguage": {
-        "message": "Russian"
-    },
-    "japaneseLanguage": {
-        "message": "Japanese"
-    },
-    "chineseLanguage": {
-        "message": "Chinese"
-    },
-    "koreanLanguage": {
-        "message": "Korean"
-    },
-    "arabicLanguage": {
-        "message": "Arabic"
-    },
-    "otherLanguage": {
-        "message": "Other..."
-    },
-    "customTargetLanguageLabel": {
-        "message": "Custom Language:"
-    },
-    "customTargetLanguagePlaceholder": {
-        "message": "Enter target language (e.g., Latin, Klingon, etc.)"
-    },
-    "pleaseSelectTargetLanguage": {
-        "message": "Please select or specify a target language"
-    },
-    "settingsSavedSuccess": {
-        "message": "Settings saved successfully!"
-    },
-    "failedToSaveSettings": {
-        "message": "Failed to save settings. Please try again."
-    },
-    "pleaseEnterApiKeyFirst": {
-        "message": "Please enter an API key first"
-    },
-    "additionalContextButton": {
-        "message": "Additional Context"
-    },
-    "additionalContextLabel": {
-        "message": "Additional Context"
-    },
-    "gettingContextStatus": {
-        "message": "Getting additional context..."
-    },
-    "contextFailedError": {
-        "message": "Failed to get additional context: $ERROR_MESSAGE$",
-        "placeholders": {
-            "error_message": {
-                "content": "$1",
-                "example": "Invalid API key"
-            }
-        }
-    },
-    "noContextNeeded": {
-        "message": "Keine zusätzlichen kulturellen oder sprachlichen Erklärungen erforderlich."
-    },
-    "textTooLongError": {
-        "message": "The text is too long ($1$ characters). Please try with a shorter text (maximum $2$ characters allowed).",
-        "placeholders": {
-            "1": {
-                "content": "$1",
-                "example": "50000"
-            },
-            "2": {
-                "content": "$2", 
-                "example": "45000"
-            }
-        }
-    },
-    "disclaimerText": {
-        "message": "LLMs can make mistakes, verify important information."
-    },
-    "noTextSelectedError": {
-        "message": "Please select some text to translate."
-    },
-    "copyButtonLabel": {
-        "message": "Copy translation"
-    },
-    "copiedStatus": {
-        "message": "Copied!"
-    },
-    "minimizeButtonLabel": {
-        "message": "Minimize"
-    },
-    "restoreButtonLabel": {
-        "message": "Restore translation window"
+  "extensionName": {
+    "message": "LLM Translator"
+  },
+  "extensionDescription": {
+    "message": "Translate text using an LLM"
+  },
+  "contextMenuTitle": {
+    "message": "Translate via LLM"
+  },
+  "noApiKeyError": {
+    "message": "No API key configured. Please set up your OpenAI API key in the extension options."
+  },
+  "translationFailedError": {
+    "message": "Translation failed: $ERROR_MESSAGE$",
+    "placeholders": {
+      "error_message": {
+        "content": "$1",
+        "example": "Invalid API key"
+      }
     }
+  },
+  "streamReaderError": {
+    "message": "Connection error while translating"
+  },
+  "modalTitle": {
+    "message": "LLM Translation"
+  },
+  "originalTextLabel": {
+    "message": "Original Text"
+  },
+  "translationLabel": {
+    "message": "Translation"
+  },
+  "translatingStatus": {
+    "message": "Translating..."
+  },
+  "closeButtonLabel": {
+    "message": "Close"
+  },
+  "settingsTitle": {
+    "message": "LLM Translator Settings"
+  },
+  "apiKeyLabel": {
+    "message": "OpenAI API Key:"
+  },
+  "apiKeyPlaceholder": {
+    "message": "sk-..."
+  },
+  "apiKeyDescription": {
+    "message": "Your API key is stored securely and only used for translation requests."
+  },
+  "getApiKeyLink": {
+    "message": "Get your API key"
+  },
+  "saveAndCheckButton": {
+    "message": "Save & Check"
+  },
+  "checkingApiKeyButton": {
+    "message": "Checking API Key..."
+  },
+  "apiKeyValidSuccess": {
+    "message": "API key is valid."
+  },
+  "failedToCheckApiKey": {
+    "message": "Failed to check API key: $ERROR_MESSAGE$",
+    "placeholders": {
+      "error_message": {
+        "content": "$1",
+        "example": "Invalid API key"
+      }
+    }
+  },
+  "modelLabel": {
+    "message": "Model:"
+  },
+  "reasoningEffortLabel": {
+    "message": "Reasoning effort:"
+  },
+  "reasoningEffortNone": {
+    "message": "None"
+  },
+  "reasoningEffortLow": {
+    "message": "Low"
+  },
+  "reasoningEffortMedium": {
+    "message": "Medium"
+  },
+  "reasoningEffortHigh": {
+    "message": "High"
+  },
+  "migrationNotice": {
+    "message": "The model selection was simplified. Please review your settings. The model has been switched to gpt-5.4 and reasoning effort now defaults to None."
+  },
+  "cardModelTitle": {
+    "message": "Model"
+  },
+  "cardLanguageTitle": {
+    "message": "Language"
+  },
+  "invalidApiKeyFormat": {
+    "message": "Invalid API key format. OpenAI API keys start with \"sk-\""
+  },
+  "targetLanguageLabel": {
+    "message": "Target Language:"
+  },
+  "germanLanguage": {
+    "message": "German"
+  },
+  "englishLanguage": {
+    "message": "English"
+  },
+  "frenchLanguage": {
+    "message": "French"
+  },
+  "spanishLanguage": {
+    "message": "Spanish"
+  },
+  "italianLanguage": {
+    "message": "Italian"
+  },
+  "portugueseLanguage": {
+    "message": "Portuguese"
+  },
+  "dutchLanguage": {
+    "message": "Dutch"
+  },
+  "russianLanguage": {
+    "message": "Russian"
+  },
+  "japaneseLanguage": {
+    "message": "Japanese"
+  },
+  "chineseLanguage": {
+    "message": "Chinese"
+  },
+  "koreanLanguage": {
+    "message": "Korean"
+  },
+  "arabicLanguage": {
+    "message": "Arabic"
+  },
+  "otherLanguage": {
+    "message": "Other..."
+  },
+  "customTargetLanguageLabel": {
+    "message": "Custom Language:"
+  },
+  "customTargetLanguagePlaceholder": {
+    "message": "Enter target language (e.g., Latin, Klingon, etc.)"
+  },
+  "pleaseEnterApiKeyFirst": {
+    "message": "Please enter an API key first"
+  },
+  "additionalContextButton": {
+    "message": "Additional Context"
+  },
+  "additionalContextLabel": {
+    "message": "Additional Context"
+  },
+  "gettingContextStatus": {
+    "message": "Getting additional context..."
+  },
+  "contextFailedError": {
+    "message": "Failed to get additional context: $ERROR_MESSAGE$",
+    "placeholders": {
+      "error_message": {
+        "content": "$1",
+        "example": "Invalid API key"
+      }
+    }
+  },
+  "textTooLongError": {
+    "message": "The text is too long ($1$ characters). Please try with a shorter text (maximum $2$ characters allowed).",
+    "placeholders": {
+      "1": {
+        "content": "$1",
+        "example": "50000"
+      },
+      "2": {
+        "content": "$2",
+        "example": "45000"
+      }
+    }
+  },
+  "disclaimerText": {
+    "message": "LLMs can make mistakes, verify important information."
+  },
+  "noTextSelectedError": {
+    "message": "Please select some text to translate."
+  },
+  "copyButtonLabel": {
+    "message": "Copy translation"
+  },
+  "copiedStatus": {
+    "message": "Copied!"
+  },
+  "minimizeButtonLabel": {
+    "message": "Minimize"
+  },
+  "restoreButtonLabel": {
+    "message": "Restore translation window"
+  }
 }

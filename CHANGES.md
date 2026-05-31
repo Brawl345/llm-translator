@@ -1,3 +1,8 @@
+## v2.0.0
+
+* Rewrite with WXT and Vue 3
+* Modernized design with polished light/dark themes
+
 ## v1.2.0
 
 * Simplify model selector

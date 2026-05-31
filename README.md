@@ -16,21 +16,21 @@ Completely coded by [Claude Code](https://www.anthropic.com/claude-code).
 
 1. Install the extension from the releases section
 2. Check the extension options and configure your OpenAI API key. Make sure the key has "read" access to the "models" and "write" access to the "completions" endpoints
-3. Select a model from the dropdown (fetched dynamically from your OpenAI account)
+3. Select a model from the dropdown
 4. Select any text on a webpage, right-click, and choose "Translate via LLM"
 
 ## Build
 
 1. Clone the repository
 2. Install dependencies with `npm ci`
-3. Run `npm run build` for production bundling
-4. Run `npm run start:firefox` or `npm run start:chrome` for starting the browser with the extension pre-loaded and ready for debugging
-5. Build extension packages with `npm run release` or a ZIP with `npm run web-ext:build`
+3. Run `npm run dev` (Chrome) or `npm run dev:firefox` to launch a browser with HMR and the extension pre-loaded
+4. Run `npm run build` / `npm run build:firefox` for a production build into `.output/`
+5. Publish a release with `npm run release <version>`
 
 ## Development
 
 - `npm run build`: Production build
-- `npm run lint:types`: TypeScript type checking
+- `npm run lint:types`: TypeScript type checking (`vue-tsc`)
 - `npm run lint:code`: Biome code linting
 
 
