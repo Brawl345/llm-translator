@@ -1,3 +1,7 @@
+## v3.0.1
+
+* Design fixup
+
 ## v3.0.0
 
 * Slight redesign with better colors and less jarring animations
