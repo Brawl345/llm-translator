@@ -23,6 +23,18 @@
   "streamReaderError": {
     "message": "Verbindungsfehler beim Übersetzen"
   },
+  "streamTimeoutError": {
+    "message": "Zeitüberschreitung beim Warten auf eine Antwort."
+  },
+  "responseIncompleteError": {
+    "message": "Die Antwort wurde abgeschnitten (Grund: $REASON$).",
+    "placeholders": {
+      "reason": {
+        "content": "$1",
+        "example": "length"
+      }
+    }
+  },
   "modalTitle": {
     "message": "LLM-Übersetzung"
   },
@@ -194,6 +206,9 @@
   },
   "copiedStatus": {
     "message": "Kopiert!"
+  },
+  "copyFailedStatus": {
+    "message": "Kopieren fehlgeschlagen"
   },
   "minimizeButtonLabel": {
     "message": "Minimieren"

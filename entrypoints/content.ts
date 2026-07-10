@@ -9,24 +9,34 @@ export default defineContentScript({
   matches: ['<all_urls>'],
   runAt: 'document_end',
   cssInjectionMode: 'ui',
-  async main(ctx) {
-    const ui = await createShadowRootUi(ctx, {
-      name: 'llm-translator-ui',
-      position: 'inline',
-      anchor: 'body',
-      append: 'last',
-      onMount: (container) => {
-        const app = createApp(TranslationModal);
-        app.mount(container);
-        return app;
-      },
-      onRemove: (app) => app?.unmount(),
-    });
+  main(ctx) {
+    // The UI is created lazily on the first translation so pages that never
+    // use the extension don't pay for a mounted Vue app.
+    let mounting: Promise<void> | null = null;
 
-    ui.mount();
+    const ensureUi = (): Promise<void> => {
+      mounting ??= createShadowRootUi(ctx, {
+        name: 'llm-translator-ui',
+        position: 'inline',
+        anchor: 'body',
+        append: 'last',
+        onMount: (container) => {
+          const app = createApp(TranslationModal);
+          app.mount(container);
+          return app;
+        },
+        onRemove: (app) => app?.unmount(),
+      }).then((ui) => {
+        ui.mount();
+      });
+      return mounting;
+    };
 
     browser.runtime.onMessage.addListener((message: ContentMessage) => {
       handleMessage(message);
+      if (message.type === 'SHOW_MODAL') {
+        void ensureUi();
+      }
     });
   },
 });

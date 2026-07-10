@@ -56,8 +56,8 @@ async function saveAndCheck(): Promise<void> {
   checking.value = true;
   keyMessage.value = null;
   try {
-    await apiKeyItem.setValue(key);
     await checkApiKey(key);
+    await apiKeyItem.setValue(key);
     keyValid.value = true;
     keyMessage.value = { text: t('apiKeyValidSuccess'), kind: 'success' };
   } catch (error) {

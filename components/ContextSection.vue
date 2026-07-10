@@ -65,17 +65,12 @@ import { requestContext, state } from './store';
   letter-spacing: -0.005em;
   transition:
     background 0.15s ease,
-    border-color 0.15s ease,
-    transform 0.12s ease;
+    border-color 0.15s ease;
 }
 
 .context-btn:hover {
   background: var(--accent-press);
   border-color: var(--accent-press);
-}
-
-.context-btn:active {
-  transform: translateY(1px);
 }
 
 .context-heading {

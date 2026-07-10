@@ -52,9 +52,9 @@ export const REASONING_EFFORT_LABELS: Record<ReasoningEffort, string> = {
   high: 'reasoningEffortHigh',
 };
 
-// Validation: the entire context window, with a rough 4-chars-per-token ratio.
-export const CONTEXT_LIMIT_TOKENS = 1047576;
-export const CHARS_PER_TOKEN = 4;
+// Cost guards: cap the combined prompt size and the completion budget.
+export const MAX_INPUT_CHARS = 50_000;
+export const MAX_OUTPUT_TOKENS = 32_768;
 
 export const CONTEXT_MENU_ID = 'translate-text';
 

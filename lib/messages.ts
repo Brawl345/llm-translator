@@ -5,9 +5,9 @@ export interface TranslationError {
 export interface ShowModalMessage {
   type: 'SHOW_MODAL';
   payload: {
+    requestId: number;
     originalText: string;
-    translatedText?: string;
-    loading?: boolean;
+    model?: string;
     error?: TranslationError;
     isStreaming?: boolean;
   };
@@ -16,7 +16,7 @@ export interface ShowModalMessage {
 export interface TranslationStreamMessage {
   type: 'TRANSLATION_STREAM';
   payload: {
-    originalText: string;
+    requestId: number;
     chunk: string;
     isComplete: boolean;
   };
@@ -25,7 +25,7 @@ export interface TranslationStreamMessage {
 export interface ContextStreamMessage {
   type: 'CONTEXT_STREAM';
   payload: {
-    originalText: string;
+    requestId: number;
     chunk: string;
     isComplete: boolean;
     error?: TranslationError;
@@ -35,9 +35,14 @@ export interface ContextStreamMessage {
 export interface GetAdditionalContextMessage {
   type: 'GET_ADDITIONAL_CONTEXT';
   payload: {
+    requestId: number;
     originalText: string;
     translatedText: string;
   };
+}
+
+export interface AbortRequestMessage {
+  type: 'ABORT_REQUEST';
 }
 
 /** Messages the background sends to the content script. */
@@ -47,6 +52,8 @@ export type ContentMessage =
   | ContextStreamMessage;
 
 /** Messages the content script sends to the background. */
-export type BackgroundMessage = GetAdditionalContextMessage;
+export type BackgroundMessage =
+  | GetAdditionalContextMessage
+  | AbortRequestMessage;
 
 export type RuntimeMessage = ContentMessage | BackgroundMessage;

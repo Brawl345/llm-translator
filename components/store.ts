@@ -1,14 +1,17 @@
 import { reactive } from 'vue';
 import { browser } from 'wxt/browser';
 import type {
+  AbortRequestMessage,
   ContentMessage,
   GetAdditionalContextMessage,
 } from '../lib/messages';
 
 interface ModalState {
+  requestId: number | null;
   visible: boolean;
   minimized: boolean;
   originalText: string;
+  model: string;
   translation: string;
   isStreaming: boolean;
   hasTranslation: boolean;
@@ -22,9 +25,11 @@ interface ModalState {
 
 function initialState(): ModalState {
   return {
+    requestId: null,
     visible: false,
     minimized: false,
     originalText: '',
+    model: '',
     translation: '',
     isStreaming: false,
     hasTranslation: false,
@@ -45,6 +50,8 @@ function resetContent(): void {
 }
 
 export function close(): void {
+  const message: AbortRequestMessage = { type: 'ABORT_REQUEST' };
+  browser.runtime.sendMessage(message).catch(() => {});
   resetContent();
 }
 
@@ -57,7 +64,13 @@ export function restore(): void {
 }
 
 export async function requestContext(): Promise<void> {
-  if (!state.hasTranslation || state.isContextStreaming) return;
+  if (
+    !state.hasTranslation ||
+    state.isContextStreaming ||
+    state.requestId === null
+  ) {
+    return;
+  }
 
   state.contextRequested = true;
   state.isContextStreaming = true;
@@ -67,6 +80,7 @@ export async function requestContext(): Promise<void> {
   const message: GetAdditionalContextMessage = {
     type: 'GET_ADDITIONAL_CONTEXT',
     payload: {
+      requestId: state.requestId,
       originalText: state.originalText,
       translatedText: state.translation,
     },
@@ -77,16 +91,20 @@ export async function requestContext(): Promise<void> {
 export function handleMessage(message: ContentMessage): void {
   switch (message.type) {
     case 'SHOW_MODAL': {
-      const { originalText, error, isStreaming } = message.payload;
+      const { requestId, originalText, model, error, isStreaming } =
+        message.payload;
       resetContent();
+      state.requestId = requestId;
       state.visible = true;
       state.originalText = originalText;
+      state.model = model ?? '';
       state.isStreaming = isStreaming ?? false;
       state.error = error ? error.message : null;
       break;
     }
     case 'TRANSLATION_STREAM': {
-      const { chunk, isComplete } = message.payload;
+      const { requestId, chunk, isComplete } = message.payload;
+      if (requestId !== state.requestId) break;
       if (isComplete) {
         state.isStreaming = false;
         state.hasTranslation = true;
@@ -96,7 +114,8 @@ export function handleMessage(message: ContentMessage): void {
       break;
     }
     case 'CONTEXT_STREAM': {
-      const { chunk, isComplete, error } = message.payload;
+      const { requestId, chunk, isComplete, error } = message.payload;
+      if (requestId !== state.requestId) break;
       if (error) {
         state.isContextStreaming = false;
         state.contextDone = true;

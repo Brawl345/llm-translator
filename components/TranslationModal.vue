@@ -1,16 +1,29 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { t } from '../lib/i18n';
 import ContextSection from './ContextSection.vue';
 import CopyButton from './CopyButton.vue';
 import OriginalSection from './OriginalSection.vue';
 import { close, minimize, restore, state } from './store';
 
+const containerRef = ref<HTMLElement | null>(null);
+
 function onKeydown(event: KeyboardEvent): void {
   if (event.key === 'Escape' && state.visible) {
     close();
   }
 }
+
+watch(
+  () => state.visible && !state.minimized,
+  async (open) => {
+    if (open) {
+      await nextTick();
+      containerRef.value?.focus();
+    }
+  },
+  { immediate: true },
+);
 
 onMounted(() => window.addEventListener('keydown', onKeydown));
 onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
@@ -34,7 +47,14 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
         class="overlay"
         @click.self="close"
       >
-        <div class="container" role="dialog" aria-modal="true">
+        <div
+          ref="containerRef"
+          class="container"
+          role="dialog"
+          aria-modal="true"
+          :aria-label="t('modalTitle')"
+          tabindex="-1"
+        >
           <header class="head">
             <div class="head-title">
               <span class="eyebrow">{{ t('modalTitle') }}</span>
@@ -111,7 +131,12 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
             <ContextSection v-if="state.hasTranslation" />
           </div>
 
-          <footer class="foot">{{ t('disclaimerText') }}</footer>
+          <footer class="foot">
+            <span>{{ t('disclaimerText') }}</span>
+            <span v-if="state.model" class="foot-model">{{
+              state.model
+            }}</span>
+          </footer>
         </div>
       </div>
     </transition>
@@ -220,17 +245,6 @@ body {
     opacity: 0;
   }
 }
-
-@keyframes llm-rise {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 </style>
 
 <style scoped>
@@ -265,6 +279,10 @@ body {
   overflow: hidden;
 }
 
+.container:focus {
+  outline: none;
+}
+
 /* Editorial vermillion masthead rule */
 .container::before {
   content: '';
@@ -283,7 +301,6 @@ body {
   gap: 16px;
   padding: 22px 22px 16px;
   flex-shrink: 0;
-  animation: llm-rise 0.32s ease both;
 }
 
 .head-title {
@@ -347,20 +364,6 @@ body {
   overflow-y: auto;
 }
 
-.content > * {
-  animation: llm-rise 0.34s ease both;
-}
-
-.content > *:nth-child(1) {
-  animation-delay: 0.05s;
-}
-.content > *:nth-child(2) {
-  animation-delay: 0.11s;
-}
-.content > *:nth-child(3) {
-  animation-delay: 0.17s;
-}
-
 .block-head {
   display: flex;
   align-items: center;
@@ -417,6 +420,10 @@ body {
 }
 
 .foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
   padding: 14px 22px;
   border-top: 1px solid var(--border);
   background: var(--surface-2);
@@ -424,7 +431,11 @@ body {
   line-height: 1.5;
   color: var(--text-muted);
   flex-shrink: 0;
-  animation: llm-rise 0.34s ease 0.2s both;
+}
+
+.foot-model {
+  flex-shrink: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 .restore {
@@ -445,11 +456,11 @@ body {
   font-weight: 700;
   letter-spacing: -0.01em;
   box-shadow: var(--shadow);
-  transition: transform 0.16s ease;
+  transition: background 0.15s ease;
 }
 
 .restore:hover {
-  transform: translateY(-2px);
+  background: var(--surface-2);
 }
 
 .restore-tick {
@@ -462,22 +473,12 @@ body {
 
 .modal-enter-active,
 .modal-leave-active {
-  transition: opacity 0.22s ease;
-}
-
-.modal-enter-active .container,
-.modal-leave-active .container {
-  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.15s ease;
 }
 
 .modal-enter-from,
 .modal-leave-to {
   opacity: 0;
-}
-
-.modal-enter-from .container,
-.modal-leave-to .container {
-  transform: scale(0.96) translateY(14px);
 }
 
 @media (max-width: 640px) {

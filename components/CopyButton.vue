@@ -5,26 +5,30 @@ import { t } from '../lib/i18n';
 const props = defineProps<{ text: string }>();
 
 const copied = ref(false);
+const failed = ref(false);
 let timer: ReturnType<typeof setTimeout> | undefined;
 
 async function copy(): Promise<void> {
+  copied.value = false;
+  failed.value = false;
   try {
     await navigator.clipboard.writeText(props.text);
     copied.value = true;
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      copied.value = false;
-    }, 2000);
   } catch {
-    // Clipboard may be unavailable; silently ignore.
+    failed.value = true;
   }
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    copied.value = false;
+    failed.value = false;
+  }, 2000);
 }
 </script>
 
 <template>
   <button
     class="copy"
-    :class="{ copied }"
+    :class="{ copied, failed }"
     :title="t('copyButtonLabel')"
     @click="copy"
   >
@@ -55,7 +59,13 @@ async function copy(): Promise<void> {
     >
       <polyline points="20 6 9 17 4 12" />
     </svg>
-    <span>{{ copied ? t('copiedStatus') : t('copyButtonLabel') }}</span>
+    <span>{{
+      copied
+        ? t('copiedStatus')
+        : failed
+          ? t('copyFailedStatus')
+          : t('copyButtonLabel')
+    }}</span>
   </button>
 </template>
 
@@ -89,6 +99,12 @@ async function copy(): Promise<void> {
   color: var(--online);
   border-color: var(--online);
   background: var(--online-soft);
+}
+
+.copy.failed {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: var(--danger-soft);
 }
 
 .copy svg {

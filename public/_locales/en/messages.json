@@ -23,6 +23,18 @@
   "streamReaderError": {
     "message": "Connection error while translating"
   },
+  "streamTimeoutError": {
+    "message": "The connection timed out while waiting for a response."
+  },
+  "responseIncompleteError": {
+    "message": "The response was cut off (reason: $REASON$).",
+    "placeholders": {
+      "reason": {
+        "content": "$1",
+        "example": "length"
+      }
+    }
+  },
   "modalTitle": {
     "message": "LLM Translation"
   },
@@ -194,6 +206,9 @@
   },
   "copiedStatus": {
     "message": "Copied!"
+  },
+  "copyFailedStatus": {
+    "message": "Copy failed"
   },
   "minimizeButtonLabel": {
     "message": "Minimize"
