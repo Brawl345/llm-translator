@@ -1,3 +1,8 @@
+## v2.1.0
+
+* Add gpt-5.6-terra and gpt-5.6-sol models
+* gpt-5.6-terra is now the default for new installs
+
 ## v2.0.0
 
 * Rewrite with WXT and Vue 3
