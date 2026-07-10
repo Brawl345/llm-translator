@@ -63,7 +63,7 @@ onBeforeUnmount(() => {
       {{ t('modalTitle') }}
     </button>
 
-    <transition name="modal">
+    <transition name="modal" appear>
       <div
         v-if="state.visible && !state.minimized"
         class="overlay"
@@ -348,7 +348,7 @@ body {
 }
 
 .translation {
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
@@ -430,7 +430,7 @@ body {
 
 .modal-enter-active,
 .modal-leave-active {
-  transition: opacity 0.15s ease;
+  transition: opacity 0.2s ease;
 }
 
 .modal-enter-from,
