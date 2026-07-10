@@ -66,16 +66,16 @@
     "message": "Hol dir deinen API-Schlüssel"
   },
   "saveAndCheckButton": {
-    "message": "Speichern & Prüfen"
+    "message": "Prüfen & Speichern"
   },
   "checkingApiKeyButton": {
     "message": "API-Schlüssel wird geprüft..."
   },
   "apiKeyValidSuccess": {
-    "message": "API-Schlüssel ist gültig."
+    "message": "API-Schlüssel ist gültig und wurde gespeichert."
   },
   "failedToCheckApiKey": {
-    "message": "Fehler beim Prüfen des API-Schlüssels: $ERROR_MESSAGE$",
+    "message": "Fehler beim Prüfen des API-Schlüssels, er wurde nicht gespeichert: $ERROR_MESSAGE$",
     "placeholders": {
       "error_message": {
         "content": "$1",
@@ -209,6 +209,9 @@
   },
   "copyFailedStatus": {
     "message": "Kopieren fehlgeschlagen"
+  },
+  "savedStatus": {
+    "message": "Gespeichert"
   },
   "minimizeButtonLabel": {
     "message": "Minimieren"

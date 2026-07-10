@@ -66,16 +66,16 @@
     "message": "Get your API key"
   },
   "saveAndCheckButton": {
-    "message": "Save & Check"
+    "message": "Check & Save"
   },
   "checkingApiKeyButton": {
     "message": "Checking API Key..."
   },
   "apiKeyValidSuccess": {
-    "message": "API key is valid."
+    "message": "API key is valid and has been saved."
   },
   "failedToCheckApiKey": {
-    "message": "Failed to check API key: $ERROR_MESSAGE$",
+    "message": "Failed to check API key, it was not saved: $ERROR_MESSAGE$",
     "placeholders": {
       "error_message": {
         "content": "$1",
@@ -209,6 +209,9 @@
   },
   "copyFailedStatus": {
     "message": "Copy failed"
+  },
+  "savedStatus": {
+    "message": "Saved"
   },
   "minimizeButtonLabel": {
     "message": "Minimize"

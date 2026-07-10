@@ -33,6 +33,18 @@ const keyMessage = ref<{ text: string; kind: 'success' | 'error' } | null>(
 );
 const showMigration = ref(false);
 
+type SavedField = 'model' | 'reasoning' | 'language';
+const savedField = ref<SavedField | null>(null);
+let savedTimer: ReturnType<typeof setTimeout> | undefined;
+
+function flashSaved(field: SavedField): void {
+  savedField.value = field;
+  clearTimeout(savedTimer);
+  savedTimer = setTimeout(() => {
+    savedField.value = null;
+  }, 2000);
+}
+
 const predefinedValues = PREDEFINED_LANGUAGES.map((l) => l.value);
 const isCustom = computed(() => languageSelection.value === 'other');
 
@@ -71,20 +83,23 @@ async function saveAndCheck(): Promise<void> {
   }
 }
 
-function persistModel(): void {
-  void modelItem.setValue(model.value);
+async function persistModel(): Promise<void> {
+  await modelItem.setValue(model.value);
+  flashSaved('model');
 }
 
-function persistReasoning(): void {
-  void reasoningEffortItem.setValue(reasoningEffort.value);
+async function persistReasoning(): Promise<void> {
+  await reasoningEffortItem.setValue(reasoningEffort.value);
+  flashSaved('reasoning');
 }
 
-function persistLanguage(): void {
+async function persistLanguage(): Promise<void> {
   const value = isCustom.value
     ? customLanguage.value.trim()
     : languageSelection.value;
   if (value) {
-    void targetLanguageItem.setValue(value);
+    await targetLanguageItem.setValue(value);
+    flashSaved('language');
   }
 }
 
@@ -184,14 +199,28 @@ onMounted(async () => {
       <section class="section">
         <h2>{{ t('cardModelTitle') }}</h2>
 
-        <label for="model">{{ t('modelLabel') }}</label>
+        <div class="label-row">
+          <label for="model">{{ t('modelLabel') }}</label>
+          <transition name="fade">
+            <span v-if="savedField === 'model'" class="saved">
+              ✓ {{ t('savedStatus') }}
+            </span>
+          </transition>
+        </div>
         <select id="model" v-model="model" @change="persistModel">
           <option v-for="m in SUPPORTED_MODELS" :key="m" :value="m">
             {{ m }}
           </option>
         </select>
 
-        <label for="reasoning">{{ t('reasoningEffortLabel') }}</label>
+        <div class="label-row">
+          <label for="reasoning">{{ t('reasoningEffortLabel') }}</label>
+          <transition name="fade">
+            <span v-if="savedField === 'reasoning'" class="saved">
+              ✓ {{ t('savedStatus') }}
+            </span>
+          </transition>
+        </div>
         <select
           id="reasoning"
           v-model="reasoningEffort"
@@ -206,7 +235,14 @@ onMounted(async () => {
       <section class="section">
         <h2>{{ t('cardLanguageTitle') }}</h2>
 
-        <label for="language">{{ t('targetLanguageLabel') }}</label>
+        <div class="label-row">
+          <label for="language">{{ t('targetLanguageLabel') }}</label>
+          <transition name="fade">
+            <span v-if="savedField === 'language'" class="saved">
+              ✓ {{ t('savedStatus') }}
+            </span>
+          </transition>
+        </div>
         <select
           id="language"
           v-model="languageSelection"
@@ -223,7 +259,9 @@ onMounted(async () => {
         </select>
 
         <template v-if="isCustom">
-          <label for="customLanguage">{{ t('customTargetLanguageLabel') }}</label>
+          <label for="customLanguage">{{
+            t('customTargetLanguageLabel')
+          }}</label>
           <input
             id="customLanguage"
             v-model="customLanguage"
@@ -317,6 +355,35 @@ label {
   margin: 14px 0 6px;
   font-weight: 600;
   font-size: 13px;
+}
+
+.label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 14px 0 6px;
+}
+
+.label-row label {
+  margin: 0;
+}
+
+.saved {
+  flex-shrink: 0;
+  color: var(--online);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 input,
