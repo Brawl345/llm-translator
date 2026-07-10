@@ -1,3 +1,10 @@
+## v3.0.0
+
+* Slight redesign with better colors and less jarring animations
+* Light/dark theme can be forced, regardless of your browser's color mode
+* Better options page
+* General refactoring for better performance and error handling
+
 ## v2.1.0
 
 * Add gpt-5.6-terra and gpt-5.6-sol models
