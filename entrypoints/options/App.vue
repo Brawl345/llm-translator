@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
 import {
+  DEFAULT_MODEL,
   PREDEFINED_LANGUAGES,
   REASONING_EFFORT_LABELS,
   REASONING_EFFORTS,
@@ -20,7 +21,7 @@ import {
 } from '../../lib/settings';
 
 const apiKey = ref('');
-const model = ref<SupportedModel>('gpt-5.4');
+const model = ref<SupportedModel>(DEFAULT_MODEL);
 const reasoningEffort = ref<ReasoningEffort>('none');
 const languageSelection = ref<string>('German');
 const customLanguage = ref('');

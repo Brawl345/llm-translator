@@ -1,4 +1,6 @@
 export type SupportedModel =
+  | 'gpt-5.6-terra'
+  | 'gpt-5.6-sol'
   | 'gpt-5.4'
   | 'gpt-5.5'
   | 'gpt-5.4-mini'
@@ -7,6 +9,8 @@ export type SupportedModel =
 export type ReasoningEffort = 'none' | 'low' | 'medium' | 'high';
 
 export const SUPPORTED_MODELS: SupportedModel[] = [
+  'gpt-5.6-terra',
+  'gpt-5.6-sol',
   'gpt-5.4',
   'gpt-5.5',
   'gpt-5.4-mini',
@@ -20,7 +24,7 @@ export const REASONING_EFFORTS: ReasoningEffort[] = [
   'high',
 ];
 
-export const DEFAULT_MODEL: SupportedModel = 'gpt-5.4';
+export const DEFAULT_MODEL: SupportedModel = 'gpt-5.6-terra';
 export const DEFAULT_REASONING_EFFORT: ReasoningEffort = 'none';
 export const DEFAULT_TARGET_LANGUAGE = 'German';
 
