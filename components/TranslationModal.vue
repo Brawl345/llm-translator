@@ -56,10 +56,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
           tabindex="-1"
         >
           <header class="head">
-            <div class="head-title">
-              <span class="eyebrow">{{ t('modalTitle') }}</span>
-              <h2 class="title">{{ t('translationLabel') }}</h2>
-            </div>
+            <h2 class="title">{{ t('modalTitle') }}</h2>
             <div class="head-actions">
               <button
                 class="icon-btn"
@@ -106,14 +103,6 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
             />
 
             <section class="block">
-              <div class="block-head">
-                <h3 class="label">{{ t('translationLabel') }}</h3>
-                <CopyButton
-                  v-if="state.hasTranslation && state.translation"
-                  :text="state.translation"
-                />
-              </div>
-
               <div v-if="state.error" class="error">{{ state.error }}</div>
               <div
                 v-else-if="!state.translation && state.isStreaming"
@@ -122,10 +111,18 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
                 <span class="spinner" />
                 {{ t('translatingStatus') }}
               </div>
-              <div v-else class="translation">
-                {{ state.translation
-                }}<span v-if="state.isStreaming" class="caret" />
-              </div>
+              <template v-else>
+                <div class="translation">
+                  {{ state.translation
+                  }}<span v-if="state.isStreaming" class="caret" />
+                </div>
+                <div
+                  v-if="state.hasTranslation && state.translation"
+                  class="block-actions"
+                >
+                  <CopyButton :text="state.translation" />
+                </div>
+              </template>
             </section>
 
             <ContextSection v-if="state.hasTranslation" />
@@ -145,31 +142,28 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
 
 <style>
 :host {
-  --surface: #faf9f6;
-  --surface-2: #f1efe8;
-  --surface-hover: #e8e5dc;
-  --border: #e3ded2;
-  --text: #16161a;
-  --text-muted: #6b6960;
-  --accent: #ff4d2e;
-  --accent-press: #e23d1f;
-  --accent-soft: rgba(255, 77, 46, 0.12);
+  --surface: #ffffff;
+  --surface-2: #f2f6f7;
+  --surface-hover: #e7eef0;
+  --border: #dde6e9;
+  --text: #15191b;
+  --text-muted: #5f7077;
+  --accent: #0e7e93;
+  --accent-soft: rgba(14, 126, 147, 0.1);
+  --accent-soft-hover: rgba(14, 126, 147, 0.18);
   --danger: #d92d20;
   --danger-soft: rgba(217, 45, 32, 0.1);
   --online: #1f9d55;
   --online-soft: rgba(31, 157, 85, 0.12);
-  --scrim: rgba(16, 16, 20, 0.5);
+  --scrim: rgba(10, 20, 23, 0.45);
   --shadow:
-    0 28px 70px -16px rgba(16, 16, 20, 0.42),
-    0 10px 26px -12px rgba(16, 16, 20, 0.28);
+    0 24px 60px -16px rgba(10, 25, 30, 0.35),
+    0 10px 24px -12px rgba(10, 25, 30, 0.22);
   --radius: 14px;
   --radius-sm: 8px;
   --font-body:
     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Cantarell,
     'Helvetica Neue', sans-serif;
-  --font-display:
-    'Avenir Next', ui-sans-serif, 'Segoe UI Variable Display', system-ui,
-    -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   font-family: var(--font-body);
 }
 
@@ -188,23 +182,23 @@ body {
 
 @media (prefers-color-scheme: dark) {
   :host {
-    --surface: #1b1b20;
-    --surface-2: #232329;
-    --surface-hover: #2d2d35;
-    --border: #2f2f37;
-    --text: #f4f1ea;
-    --text-muted: #9b988e;
-    --accent: #ff5c3d;
-    --accent-press: #ff7257;
-    --accent-soft: rgba(255, 92, 61, 0.16);
+    --surface: #171d20;
+    --surface-2: #1e262a;
+    --surface-hover: #273135;
+    --border: #2c383d;
+    --text: #eef3f4;
+    --text-muted: #93a3aa;
+    --accent: #4cbdd1;
+    --accent-soft: rgba(76, 189, 209, 0.14);
+    --accent-soft-hover: rgba(76, 189, 209, 0.24);
     --danger: #ff6b5e;
     --danger-soft: rgba(255, 107, 94, 0.12);
     --online: #34c759;
     --online-soft: rgba(52, 199, 89, 0.16);
     --scrim: rgba(0, 0, 0, 0.6);
     --shadow:
-      0 28px 80px -16px rgba(0, 0, 0, 0.72),
-      0 10px 26px -12px rgba(0, 0, 0, 0.55);
+      0 24px 70px -16px rgba(0, 0, 0, 0.7),
+      0 10px 24px -12px rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -283,49 +277,21 @@ body {
   outline: none;
 }
 
-/* Editorial vermillion masthead rule */
-.container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--accent);
-}
-
 .head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 22px 22px 16px;
+  padding: 14px 20px 10px;
   flex-shrink: 0;
-}
-
-.head-title {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-
-.eyebrow {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--accent);
 }
 
 .title {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: 23px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
-  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text-muted);
 }
 
 .head-actions {
@@ -338,67 +304,42 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: 1px solid transparent;
+  width: 30px;
+  height: 30px;
+  border: none;
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--text-muted);
   transition:
     background 0.15s ease,
-    color 0.15s ease,
-    border-color 0.15s ease;
+    color 0.15s ease;
 }
 
 .icon-btn:hover {
   background: var(--surface-hover);
-  border-color: var(--border);
   color: var(--text);
 }
 
 .content {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 6px 22px 22px;
+  gap: 16px;
+  padding: 2px 20px 20px;
   overflow-y: auto;
-}
-
-.block-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.label {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  margin: 0;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.label::before {
-  content: '';
-  width: 16px;
-  height: 2px;
-  background: var(--accent);
-  flex-shrink: 0;
 }
 
 .translation {
   font-size: 15px;
   line-height: 1.6;
-  letter-spacing: -0.005em;
   white-space: pre-wrap;
   word-break: break-word;
   color: var(--text);
+}
+
+.block-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
 }
 
 .loading {
@@ -424,9 +365,8 @@ body {
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 22px;
+  padding: 11px 20px;
   border-top: 1px solid var(--border);
-  background: var(--surface-2);
   font-size: 11px;
   line-height: 1.5;
   color: var(--text-muted);
@@ -451,10 +391,8 @@ body {
   border-radius: 12px;
   background: var(--surface);
   color: var(--text);
-  font-family: var(--font-display);
   font-size: 14px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-weight: 600;
   box-shadow: var(--shadow);
   transition: background 0.15s ease;
 }

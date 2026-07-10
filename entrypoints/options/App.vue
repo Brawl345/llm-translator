@@ -256,17 +256,6 @@ onMounted(async () => {
   overflow: hidden;
 }
 
-/* Editorial vermillion masthead rule, matching the translation modal */
-.container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--accent);
-}
-
 .head {
   display: flex;
   align-items: center;
@@ -281,11 +270,9 @@ onMounted(async () => {
 
 .head h1 {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .banner {
@@ -310,23 +297,12 @@ onMounted(async () => {
 }
 
 .section h2 {
-  display: flex;
-  align-items: center;
-  gap: 9px;
   margin: 0 0 4px;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted);
-}
-
-.section h2::before {
-  content: '';
-  width: 16px;
-  height: 2px;
-  background: var(--accent);
-  flex-shrink: 0;
 }
 
 .hint {
@@ -394,13 +370,13 @@ input.invalid {
   border-radius: var(--radius-sm);
   border: 1px solid var(--accent);
   background: var(--accent);
-  color: #fff;
-  font-family: var(--font-display);
-  font-weight: 700;
+  color: var(--on-accent);
+  font-weight: 600;
   font-size: 14px;
-  letter-spacing: -0.005em;
   white-space: nowrap;
-  transition: all 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .check:hover:not(:disabled) {

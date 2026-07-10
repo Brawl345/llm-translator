@@ -80,7 +80,7 @@ async function copy(): Promise<void> {
   background: var(--surface-2);
   color: var(--text-muted);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   transition:

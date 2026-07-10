@@ -47,50 +47,34 @@ import { requestContext, state } from './store';
 <style scoped>
 .context {
   border-top: 1px solid var(--border);
-  padding-top: 18px;
+  padding-top: 16px;
 }
 
 .context-btn {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  padding: 11px 18px;
-  border: 1px solid var(--accent);
+  gap: 8px;
+  padding: 9px 14px;
+  border: none;
   border-radius: var(--radius-sm);
-  background: var(--accent);
-  color: #fff;
-  font-family: var(--font-display);
+  background: var(--accent-soft);
+  color: var(--accent);
   font-size: 13px;
-  font-weight: 700;
-  letter-spacing: -0.005em;
-  transition:
-    background 0.15s ease,
-    border-color 0.15s ease;
+  font-weight: 600;
+  transition: background 0.15s ease;
 }
 
 .context-btn:hover {
-  background: var(--accent-press);
-  border-color: var(--accent-press);
+  background: var(--accent-soft-hover);
 }
 
 .context-heading {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted);
-}
-
-.context-heading::before {
-  content: '';
-  width: 16px;
-  height: 2px;
-  background: var(--accent);
-  flex-shrink: 0;
 }
 
 .loading {
@@ -102,7 +86,7 @@ import { requestContext, state } from './store';
 }
 
 .context-text {
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;

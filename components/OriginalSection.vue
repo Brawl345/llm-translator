@@ -37,10 +37,10 @@ summary {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 11px 14px;
+  padding: 10px 13px;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted);
   cursor: pointer;
@@ -58,7 +58,7 @@ summary::-webkit-details-marker {
 }
 
 .chevron {
-  color: var(--accent);
+  color: var(--text-muted);
   transition: transform 0.2s ease;
 }
 
@@ -67,11 +67,11 @@ summary::-webkit-details-marker {
 }
 
 .body {
-  padding: 2px 14px 13px;
-  font-size: 14px;
+  padding: 2px 13px 12px;
+  font-size: 13px;
   line-height: 1.55;
   white-space: pre-wrap;
   word-break: break-word;
-  color: var(--text);
+  color: var(--text-muted);
 }
 </style>
