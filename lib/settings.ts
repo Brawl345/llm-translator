@@ -3,10 +3,12 @@ import {
   DEFAULT_MODEL,
   DEFAULT_REASONING_EFFORT,
   DEFAULT_TARGET_LANGUAGE,
+  DEFAULT_THEME,
   isReasoningEffort,
   isSupportedModel,
   type ReasoningEffort,
   type SupportedModel,
+  type ThemePreference,
 } from './constants';
 
 export interface Settings {
@@ -32,6 +34,9 @@ export const targetLanguageItem = storage.defineItem<string>(
   'sync:targetLanguage',
   { fallback: DEFAULT_TARGET_LANGUAGE },
 );
+export const themeItem = storage.defineItem<ThemePreference>('sync:theme', {
+  fallback: DEFAULT_THEME,
+});
 export const showMigrationNoticeItem = storage.defineItem<boolean>(
   'local:showMigrationNotice',
   { fallback: false },

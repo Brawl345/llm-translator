@@ -2,12 +2,17 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import {
   DEFAULT_MODEL,
+  DEFAULT_THEME,
+  isThemePreference,
   PREDEFINED_LANGUAGES,
   REASONING_EFFORT_LABELS,
   REASONING_EFFORTS,
   type ReasoningEffort,
   SUPPORTED_MODELS,
   type SupportedModel,
+  THEME_LABELS,
+  THEME_PREFERENCES,
+  type ThemePreference,
 } from '../../lib/constants';
 import { t } from '../../lib/i18n';
 import { checkApiKey } from '../../lib/openai';
@@ -18,6 +23,7 @@ import {
   reasoningEffortItem,
   showMigrationNoticeItem,
   targetLanguageItem,
+  themeItem,
 } from '../../lib/settings';
 
 const apiKey = ref('');
@@ -25,6 +31,7 @@ const model = ref<SupportedModel>(DEFAULT_MODEL);
 const reasoningEffort = ref<ReasoningEffort>('none');
 const languageSelection = ref<string>('German');
 const customLanguage = ref('');
+const theme = ref<ThemePreference>(DEFAULT_THEME);
 
 const checking = ref(false);
 const keyValid = ref(false);
@@ -33,7 +40,7 @@ const keyMessage = ref<{ text: string; kind: 'success' | 'error' } | null>(
 );
 const showMigration = ref(false);
 
-type SavedField = 'model' | 'reasoning' | 'language';
+type SavedField = 'model' | 'reasoning' | 'language' | 'theme';
 const savedField = ref<SavedField | null>(null);
 let savedTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -103,10 +110,28 @@ async function persistLanguage(): Promise<void> {
   }
 }
 
+function applyTheme(value: ThemePreference): void {
+  if (value === 'auto') {
+    delete document.documentElement.dataset.theme;
+  } else {
+    document.documentElement.dataset.theme = value;
+  }
+}
+
+async function persistTheme(): Promise<void> {
+  await themeItem.setValue(theme.value);
+  applyTheme(theme.value);
+  flashSaved('theme');
+}
+
 onMounted(async () => {
   const settings = await getSettings();
   model.value = settings.model;
   reasoningEffort.value = settings.reasoningEffort;
+
+  const storedTheme = await themeItem.getValue();
+  theme.value = isThemePreference(storedTheme) ? storedTheme : DEFAULT_THEME;
+  applyTheme(theme.value);
 
   if (predefinedValues.includes(settings.targetLanguage)) {
     languageSelection.value = settings.targetLanguage;
@@ -271,6 +296,24 @@ onMounted(async () => {
             @change="persistLanguage"
           />
         </template>
+      </section>
+
+      <section class="section">
+        <h2>{{ t('cardAppearanceTitle') }}</h2>
+
+        <div class="label-row">
+          <label for="theme">{{ t('themeLabel') }}</label>
+          <transition name="fade">
+            <span v-if="savedField === 'theme'" class="saved">
+              ✓ {{ t('savedStatus') }}
+            </span>
+          </transition>
+        </div>
+        <select id="theme" v-model="theme" @change="persistTheme">
+          <option v-for="p in THEME_PREFERENCES" :key="p" :value="p">
+            {{ t(THEME_LABELS[p]) }}
+          </option>
+        </select>
       </section>
     </div>
   </div>

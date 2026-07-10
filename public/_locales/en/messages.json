@@ -110,6 +110,21 @@
   "cardLanguageTitle": {
     "message": "Language"
   },
+  "cardAppearanceTitle": {
+    "message": "Appearance"
+  },
+  "themeLabel": {
+    "message": "Theme:"
+  },
+  "themeAuto": {
+    "message": "Automatic"
+  },
+  "themeLight": {
+    "message": "Light"
+  },
+  "themeDark": {
+    "message": "Dark"
+  },
   "invalidApiKeyFormat": {
     "message": "Invalid API key format. OpenAI API keys start with \"sk-\""
   },

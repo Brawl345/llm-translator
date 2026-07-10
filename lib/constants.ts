@@ -24,9 +24,14 @@ export const REASONING_EFFORTS: ReasoningEffort[] = [
   'high',
 ];
 
+export type ThemePreference = 'auto' | 'light' | 'dark';
+
+export const THEME_PREFERENCES: ThemePreference[] = ['auto', 'light', 'dark'];
+
 export const DEFAULT_MODEL: SupportedModel = 'gpt-5.6-terra';
 export const DEFAULT_REASONING_EFFORT: ReasoningEffort = 'none';
 export const DEFAULT_TARGET_LANGUAGE = 'German';
+export const DEFAULT_THEME: ThemePreference = 'auto';
 
 // Predefined languages with their i18n message keys. "other" triggers the
 // custom free-text input on the options page.
@@ -52,6 +57,12 @@ export const REASONING_EFFORT_LABELS: Record<ReasoningEffort, string> = {
   high: 'reasoningEffortHigh',
 };
 
+export const THEME_LABELS: Record<ThemePreference, string> = {
+  auto: 'themeAuto',
+  light: 'themeLight',
+  dark: 'themeDark',
+};
+
 // Cost guards: cap the combined prompt size and the completion budget.
 export const MAX_INPUT_CHARS = 50_000;
 export const MAX_OUTPUT_TOKENS = 32_768;
@@ -69,5 +80,12 @@ export function isReasoningEffort(value: unknown): value is ReasoningEffort {
   return (
     typeof value === 'string' &&
     REASONING_EFFORTS.includes(value as ReasoningEffort)
+  );
+}
+
+export function isThemePreference(value: unknown): value is ThemePreference {
+  return (
+    typeof value === 'string' &&
+    THEME_PREFERENCES.includes(value as ThemePreference)
   );
 }

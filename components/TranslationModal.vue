@@ -1,12 +1,20 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import {
+  DEFAULT_THEME,
+  isThemePreference,
+  type ThemePreference,
+} from '../lib/constants';
 import { t } from '../lib/i18n';
+import { themeItem } from '../lib/settings';
 import ContextSection from './ContextSection.vue';
 import CopyButton from './CopyButton.vue';
 import OriginalSection from './OriginalSection.vue';
 import { close, minimize, restore, state } from './store';
 
 const containerRef = ref<HTMLElement | null>(null);
+const theme = ref<ThemePreference>(DEFAULT_THEME);
+let unwatchTheme: (() => void) | undefined;
 
 function onKeydown(event: KeyboardEvent): void {
   if (event.key === 'Escape' && state.visible) {
@@ -25,12 +33,26 @@ watch(
   { immediate: true },
 );
 
-onMounted(() => window.addEventListener('keydown', onKeydown));
-onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
+onMounted(async () => {
+  window.addEventListener('keydown', onKeydown);
+  unwatchTheme = themeItem.watch((value) => {
+    theme.value = isThemePreference(value) ? value : DEFAULT_THEME;
+  });
+  const stored = await themeItem.getValue();
+  theme.value = isThemePreference(stored) ? stored : DEFAULT_THEME;
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onKeydown);
+  unwatchTheme?.();
+});
 </script>
 
 <template>
-  <div class="modal-root">
+  <div
+    class="modal-root"
+    :class="{ 'theme-light': theme === 'light', 'theme-dark': theme === 'dark' }"
+  >
     <button
       v-if="state.visible && state.minimized"
       class="restore"
@@ -142,23 +164,6 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
 
 <style>
 :host {
-  --surface: #ffffff;
-  --surface-2: #f2f6f7;
-  --surface-hover: #e7eef0;
-  --border: #dde6e9;
-  --text: #15191b;
-  --text-muted: #5f7077;
-  --accent: #0e7e93;
-  --accent-soft: rgba(14, 126, 147, 0.1);
-  --accent-soft-hover: rgba(14, 126, 147, 0.18);
-  --danger: #d92d20;
-  --danger-soft: rgba(217, 45, 32, 0.1);
-  --online: #1f9d55;
-  --online-soft: rgba(31, 157, 85, 0.12);
-  --scrim: rgba(10, 20, 23, 0.45);
-  --shadow:
-    0 24px 60px -16px rgba(10, 25, 30, 0.35),
-    0 10px 24px -12px rgba(10, 25, 30, 0.22);
   --radius: 14px;
   --radius-sm: 8px;
   --font-body:
@@ -176,30 +181,44 @@ body {
   font-family: var(--font-body);
   font-size: 14px;
   line-height: 1.5;
-  color: var(--text);
   -webkit-font-smoothing: antialiased;
 }
 
-@media (prefers-color-scheme: dark) {
-  :host {
-    --surface: #171d20;
-    --surface-2: #1e262a;
-    --surface-hover: #273135;
-    --border: #2c383d;
-    --text: #eef3f4;
-    --text-muted: #93a3aa;
-    --accent: #4cbdd1;
-    --accent-soft: rgba(76, 189, 209, 0.14);
-    --accent-soft-hover: rgba(76, 189, 209, 0.24);
-    --danger: #ff6b5e;
-    --danger-soft: rgba(255, 107, 94, 0.12);
-    --online: #34c759;
-    --online-soft: rgba(52, 199, 89, 0.16);
-    --scrim: rgba(0, 0, 0, 0.6);
-    --shadow:
-      0 24px 70px -16px rgba(0, 0, 0, 0.7),
-      0 10px 24px -12px rgba(0, 0, 0, 0.5);
-  }
+/* The color-scheme on .modal-root drives every light-dark() pair below;
+   the theme-* classes force it independently of the OS preference. */
+.modal-root {
+  color-scheme: light dark;
+  --surface: light-dark(#ffffff, #171d20);
+  --surface-2: light-dark(#f2f6f7, #1e262a);
+  --surface-hover: light-dark(#e7eef0, #273135);
+  --border: light-dark(#dde6e9, #2c383d);
+  --text: light-dark(#15191b, #eef3f4);
+  --text-muted: light-dark(#5f7077, #93a3aa);
+  --accent: light-dark(#0e7e93, #4cbdd1);
+  --accent-soft: light-dark(
+    rgba(14, 126, 147, 0.1),
+    rgba(76, 189, 209, 0.14)
+  );
+  --accent-soft-hover: light-dark(
+    rgba(14, 126, 147, 0.18),
+    rgba(76, 189, 209, 0.24)
+  );
+  --danger: light-dark(#d92d20, #ff6b5e);
+  --danger-soft: light-dark(rgba(217, 45, 32, 0.1), rgba(255, 107, 94, 0.12));
+  --online: light-dark(#1f9d55, #34c759);
+  --online-soft: light-dark(rgba(31, 157, 85, 0.12), rgba(52, 199, 89, 0.16));
+  --scrim: light-dark(rgba(10, 20, 23, 0.45), rgba(0, 0, 0, 0.6));
+  --shadow:
+    0 24px 60px -16px light-dark(rgba(10, 25, 30, 0.35), rgba(0, 0, 0, 0.7)),
+    0 10px 24px -12px light-dark(rgba(10, 25, 30, 0.22), rgba(0, 0, 0, 0.5));
+}
+
+.modal-root.theme-light {
+  color-scheme: light;
+}
+
+.modal-root.theme-dark {
+  color-scheme: dark;
 }
 
 *,
