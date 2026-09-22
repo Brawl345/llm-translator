@@ -1,3 +1,9 @@
+## v3.1.0
+
+* Add gpt-6-luna and gpt-6-sol models
+* gpt-6-luna is now the default for new installs
+* Custom model IDs can be entered in the options
+
 ## v3.0.1
 
 * Design fixup
