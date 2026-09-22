@@ -55,7 +55,9 @@ informal (Du) form. Placeholder substitutions use the `$N$` / `$1` content forma
 
 - **Input Validation**: combined system prompt + user text is checked against `MAX_INPUT_CHARS` (`lib/openai.ts`);
   completions are capped at `MAX_OUTPUT_TOKENS`.
-- **Models**: static `SUPPORTED_MODELS` in `lib/constants.ts`; `reasoning_effort` is sent on every request.
+- **Models**: static `SUPPORTED_MODELS` in `lib/constants.ts`, plus a "custom" option: `sync:model` holds `'custom'`
+  and `sync:customModel` holds the free-text model ID (`getSettings` resolves it, falling back to `DEFAULT_MODEL` when
+  empty). `reasoning_effort` is sent on every request.
 - **Streaming lifecycle**: one `AbortController` per tab in the background; a new request, an `ABORT_REQUEST` message
   (modal close), or 60s without data aborts the stream. Stream messages carry a `requestId` the store filters on.
 - **UI**: collapsible original text, streaming display with loading/caret states, additional-context button (hidden

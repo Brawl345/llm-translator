@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
 import {
+  CUSTOM_MODEL,
   DEFAULT_MODEL,
   DEFAULT_THEME,
+  isModelSelection,
   isThemePreference,
+  type ModelSelection,
   PREDEFINED_LANGUAGES,
   REASONING_EFFORT_LABELS,
   REASONING_EFFORTS,
   type ReasoningEffort,
   SUPPORTED_MODELS,
-  type SupportedModel,
   THEME_LABELS,
   THEME_PREFERENCES,
   type ThemePreference,
@@ -18,6 +20,7 @@ import { t } from '../../lib/i18n';
 import { checkApiKey } from '../../lib/openai';
 import {
   apiKeyItem,
+  customModelItem,
   getSettings,
   modelItem,
   reasoningEffortItem,
@@ -27,7 +30,8 @@ import {
 } from '../../lib/settings';
 
 const apiKey = ref('');
-const model = ref<SupportedModel>(DEFAULT_MODEL);
+const model = ref<ModelSelection>(DEFAULT_MODEL);
+const customModel = ref('');
 const reasoningEffort = ref<ReasoningEffort>('none');
 const languageSelection = ref<string>('German');
 const customLanguage = ref('');
@@ -54,6 +58,7 @@ function flashSaved(field: SavedField): void {
 
 const predefinedValues = PREDEFINED_LANGUAGES.map((l) => l.value);
 const isCustom = computed(() => languageSelection.value === 'other');
+const isCustomModel = computed(() => model.value === CUSTOM_MODEL);
 
 // Editing the key invalidates the previous "checked" state.
 watch(apiKey, () => {
@@ -95,6 +100,12 @@ async function persistModel(): Promise<void> {
   flashSaved('model');
 }
 
+async function persistCustomModel(): Promise<void> {
+  customModel.value = customModel.value.trim();
+  await customModelItem.setValue(customModel.value);
+  flashSaved('model');
+}
+
 async function persistReasoning(): Promise<void> {
   await reasoningEffortItem.setValue(reasoningEffort.value);
   flashSaved('reasoning');
@@ -125,8 +136,13 @@ async function persistTheme(): Promise<void> {
 }
 
 onMounted(async () => {
-  const settings = await getSettings();
-  model.value = settings.model;
+  const [settings, storedModel, storedCustomModel] = await Promise.all([
+    getSettings(),
+    modelItem.getValue(),
+    customModelItem.getValue(),
+  ]);
+  model.value = isModelSelection(storedModel) ? storedModel : DEFAULT_MODEL;
+  customModel.value = storedCustomModel;
   reasoningEffort.value = settings.reasoningEffort;
 
   const storedTheme = await themeItem.getValue();
@@ -236,7 +252,23 @@ onMounted(async () => {
           <option v-for="m in SUPPORTED_MODELS" :key="m" :value="m">
             {{ m }}
           </option>
+          <option :value="CUSTOM_MODEL">{{ t('customModelOption') }}</option>
         </select>
+
+        <template v-if="isCustomModel">
+          <label for="customModel">{{ t('customModelLabel') }}</label>
+          <input
+            id="customModel"
+            v-model="customModel"
+            type="text"
+            maxlength="100"
+            autocomplete="off"
+            spellcheck="false"
+            :placeholder="t('customModelPlaceholder')"
+            @change="persistCustomModel"
+          />
+          <p class="hint">{{ t('customModelHint', DEFAULT_MODEL) }}</p>
+        </template>
 
         <div class="label-row">
           <label for="reasoning">{{ t('reasoningEffortLabel') }}</label>

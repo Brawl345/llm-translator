@@ -1,4 +1,6 @@
 export type SupportedModel =
+  | 'gpt-6-luna'
+  | 'gpt-6-sol'
   | 'gpt-5.6-terra'
   | 'gpt-5.6-sol'
   | 'gpt-5.4'
@@ -6,9 +8,15 @@ export type SupportedModel =
   | 'gpt-5.4-mini'
   | 'gpt-5.4-nano';
 
+// Stored in `sync:model` when the user supplies their own model ID.
+export const CUSTOM_MODEL = 'custom';
+export type ModelSelection = SupportedModel | typeof CUSTOM_MODEL;
+
 export type ReasoningEffort = 'none' | 'low' | 'medium' | 'high';
 
 export const SUPPORTED_MODELS: SupportedModel[] = [
+  'gpt-6-luna',
+  'gpt-6-sol',
   'gpt-5.6-terra',
   'gpt-5.6-sol',
   'gpt-5.4',
@@ -28,7 +36,7 @@ export type ThemePreference = 'auto' | 'light' | 'dark';
 
 export const THEME_PREFERENCES: ThemePreference[] = ['auto', 'light', 'dark'];
 
-export const DEFAULT_MODEL: SupportedModel = 'gpt-5.6-terra';
+export const DEFAULT_MODEL: SupportedModel = 'gpt-6-luna';
 export const DEFAULT_REASONING_EFFORT: ReasoningEffort = 'none';
 export const DEFAULT_TARGET_LANGUAGE = 'German';
 export const DEFAULT_THEME: ThemePreference = 'auto';
@@ -74,6 +82,10 @@ export function isSupportedModel(value: unknown): value is SupportedModel {
     typeof value === 'string' &&
     SUPPORTED_MODELS.includes(value as SupportedModel)
   );
+}
+
+export function isModelSelection(value: unknown): value is ModelSelection {
+  return value === CUSTOM_MODEL || isSupportedModel(value);
 }
 
 export function isReasoningEffort(value: unknown): value is ReasoningEffort {

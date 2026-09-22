@@ -1,19 +1,21 @@
 import { storage } from '#imports';
 import {
+  CUSTOM_MODEL,
   DEFAULT_MODEL,
   DEFAULT_REASONING_EFFORT,
   DEFAULT_TARGET_LANGUAGE,
   DEFAULT_THEME,
+  isModelSelection,
   isReasoningEffort,
   isSupportedModel,
+  type ModelSelection,
   type ReasoningEffort,
-  type SupportedModel,
   type ThemePreference,
 } from './constants';
 
 export interface Settings {
   apiKey: string;
-  model: SupportedModel;
+  model: string;
   reasoningEffort: ReasoningEffort;
   targetLanguage: string;
 }
@@ -23,8 +25,11 @@ export interface Settings {
 export const apiKeyItem = storage.defineItem<string>('sync:apiKey', {
   fallback: '',
 });
-export const modelItem = storage.defineItem<SupportedModel>('sync:model', {
+export const modelItem = storage.defineItem<ModelSelection>('sync:model', {
   fallback: DEFAULT_MODEL,
+});
+export const customModelItem = storage.defineItem<string>('sync:customModel', {
+  fallback: '',
 });
 export const reasoningEffortItem = storage.defineItem<ReasoningEffort>(
   'sync:reasoningEffort',
@@ -42,17 +47,27 @@ export const showMigrationNoticeItem = storage.defineItem<boolean>(
   { fallback: false },
 );
 
+function resolveModel(model: unknown, customModel: unknown): string {
+  if (model === CUSTOM_MODEL) {
+    const id = typeof customModel === 'string' ? customModel.trim() : '';
+    return id || DEFAULT_MODEL;
+  }
+  return isSupportedModel(model) ? model : DEFAULT_MODEL;
+}
+
 export async function getSettings(): Promise<Settings> {
-  const [apiKey, model, reasoningEffort, targetLanguage] = await Promise.all([
-    apiKeyItem.getValue(),
-    modelItem.getValue(),
-    reasoningEffortItem.getValue(),
-    targetLanguageItem.getValue(),
-  ]);
+  const [apiKey, model, customModel, reasoningEffort, targetLanguage] =
+    await Promise.all([
+      apiKeyItem.getValue(),
+      modelItem.getValue(),
+      customModelItem.getValue(),
+      reasoningEffortItem.getValue(),
+      targetLanguageItem.getValue(),
+    ]);
 
   return {
     apiKey: typeof apiKey === 'string' ? apiKey : '',
-    model: isSupportedModel(model) ? model : DEFAULT_MODEL,
+    model: resolveModel(model, customModel),
     reasoningEffort: isReasoningEffort(reasoningEffort)
       ? reasoningEffort
       : DEFAULT_REASONING_EFFORT,
@@ -72,7 +87,7 @@ export async function migrateSettings(): Promise<boolean> {
   let changed = false;
 
   const model = await modelItem.getValue();
-  if (!isSupportedModel(model)) {
+  if (!isModelSelection(model)) {
     await modelItem.setValue(DEFAULT_MODEL);
     changed = true;
   }

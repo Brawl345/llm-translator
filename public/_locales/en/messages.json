@@ -86,6 +86,24 @@
   "modelLabel": {
     "message": "Model:"
   },
+  "customModelOption": {
+    "message": "Custom..."
+  },
+  "customModelLabel": {
+    "message": "Custom Model ID:"
+  },
+  "customModelPlaceholder": {
+    "message": "Enter a model ID (e.g., gpt-6-luna-2026-09-01)"
+  },
+  "customModelHint": {
+    "message": "Any model ID from your OpenAI account. $DEFAULT_MODEL$ is used while this field is empty.",
+    "placeholders": {
+      "default_model": {
+        "content": "$1",
+        "example": "gpt-6-luna"
+      }
+    }
+  },
   "reasoningEffortLabel": {
     "message": "Reasoning effort:"
   },
